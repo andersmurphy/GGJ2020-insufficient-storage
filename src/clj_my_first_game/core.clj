@@ -4,36 +4,38 @@
            [javafx.scene.paint Color]))
 
 (def *state
-  (atom {:gravity  10
-         :friction 0.4}))
+  (atom {:player {:color  Color/GREEN
+                  :x      100
+                  :y      100
+                  :height 50
+                  :width  50}}))
 
 (defmulti event-handler :event/type)
 
-(defn draw-entity [{:keys [color x y width height]} ^Canvas canvas]
+(defn draw-entity [canvas-width canvas-height {:keys [color x y width height]} ^Canvas canvas]
   (doto (.getGraphicsContext2D canvas)
-    (.clearRect x y width height)
+    (.clearRect 0 0 canvas-width canvas-height)
     (.setFill color)
     (.fillRect x y width height)))
 
-(defn root-view [{{:keys [gravity friction]} :state}]
-  (let [width  400
-        height 400]
+(defn root-view [{{:keys [player]} :state}]
+  (let [canvas-width  400
+        canvas-height 400]
     {:fx/type :stage
      :showing true
-     :width   width
-     :height  height
+     :width   canvas-width
+     :height  canvas-height
      :x       200
      :y       200
      :scene   {:fx/type :scene
                :root    {:fx/type  :h-box
                          :children [{:fx/type :canvas
-                                     :height  height
-                                     :width   width
-                                     :draw    (partial draw-entity {:color  Color/GREEN
-                                                                    :x      50
-                                                                    :y      50
-                                                                    :height 50
-                                                                    :width  50})}]}}}))
+                                     :height  canvas-height
+                                     :width   canvas-width
+                                     :draw    (partial draw-entity
+                                                       canvas-width
+                                                       canvas-height
+                                                       player)}]}}}))
 
 (def renderer
   (fx/create-renderer
@@ -43,4 +45,5 @@
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (comment (fx/mount-renderer *state renderer)
+         (swap! *state update-in [:player :x] - 50)
          )
