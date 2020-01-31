@@ -56,7 +56,8 @@
 (defmethod event-handler :event/scene-key-press [e]
   (let [key-code (.getCode ^KeyEvent (:fx/event e))]
     (condp = key-code
-      KeyCode/ENTER (swap! *state update-in [:entities 0 :y] - 50))))
+      KeyCode/ENTER (swap! *state update-in [:entities 0 :y] - 50)
+      :empty)))
 
 (def renderer
   (fx/create-renderer
