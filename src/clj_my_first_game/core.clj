@@ -9,6 +9,12 @@
 
 (defmulti event-handler :event/type)
 
+(defn draw-entity [{:keys [color x y width height]} ^Canvas canvas]
+  (doto (.getGraphicsContext2D canvas)
+    (.clearRect x y width height)
+    (.setFill color)
+    (.fillRect x y width height)))
+
 (defn root-view [{{:keys [gravity friction]} :state}]
   (let [width  400
         height 400]
@@ -23,12 +29,11 @@
                          :children [{:fx/type :canvas
                                      :height  height
                                      :width   width
-                                     :draw    (fn [^Canvas canvas]
-                                                (doto (.getGraphicsContext2D canvas)
-                                                  (.clearRect 0 0 100 100)
-                                                  (.setFill Color/GREEN)
-                                                  (.fillRoundRect 0 0 100 200 100 100)
-                                                  ))}]}}}))
+                                     :draw    (partial draw-entity {:color  Color/GREEN
+                                                                    :x      50
+                                                                    :y      50
+                                                                    :height 50
+                                                                    :width  50})}]}}}))
 
 (def renderer
   (fx/create-renderer
