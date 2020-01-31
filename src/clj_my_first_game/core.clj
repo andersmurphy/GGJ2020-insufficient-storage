@@ -51,12 +51,12 @@
                                                               entities)}]}
                :on-key-pressed {:event/type :event/scene-key-press}}}))
 
-(defn event-handler  [e]
-  (case (:event/type e)
-    :event/scene-key-press
-    (let [key-code (.getCode ^KeyEvent (:fx/event e))]
-      (condp = key-code
-        KeyCode/ENTER (swap! *state update-in [:entities 0 :x] - 50)))))
+(defmulti event-handler :event/type)
+
+(defmethod event-handler :event/scene-key-press [e]
+  (let [key-code (.getCode ^KeyEvent (:fx/event e))]
+    (condp = key-code
+      KeyCode/ENTER (swap! *state update-in [:entities 0 :y] - 50))))
 
 (def renderer
   (fx/create-renderer
