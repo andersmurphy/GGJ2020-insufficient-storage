@@ -4,22 +4,21 @@
            [javafx.scene.input KeyCode KeyEvent]
            [javafx.scene.paint Color]))
 
+(def tile-size 50)
+
 (def *state
   (atom {:entities [{:color  Color/GREEN
-                     :x      50
-                     :y      50
-                     :height 50
-                     :width  50}
+                     :pos    {:x 1 :y 1}
+                     :height tile-size
+                     :width  tile-size}
                     {:color  Color/GREEN
-                     :x      100
-                     :y      100
-                     :height 50
-                     :width  50}
+                     :pos    {:x 2 :y 2}
+                     :height tile-size
+                     :width  tile-size}
                     {:color  Color/GREEN
-                     :x      150
-                     :y      150
-                     :height 50
-                     :width  50}]
+                     :pos    {:x 3 :y 3}
+                     :height tile-size
+                     :width  tile-size}]
          :current-memories ["Bicycle"]
          :current-tools []
          :obstacles [{:name "Deep Pit"
@@ -29,14 +28,16 @@
                   :image "JumpingLegs.png"
                   :loses-memory "Bicycle"}]
          :memories [{:name "Bicycle"
-                     :image "BicycleImage.png"}]}))
-         
-  
+                     :image "BicycleImage.png"}]
+         }
+        )
+  )
 
-(defn draw-entity [^Canvas canvas {:keys [color x y width height] :as m}]
+(defn draw-entity [^Canvas canvas {color       :color
+                                   {x :x y :y} :pos}]
   (doto (.getGraphicsContext2D canvas)
     (.setFill color)
-    (.fillRect x y width height)))
+    (.fillRect (* tile-size x) (* tile-size y) tile-size tile-size)))
 
 (defn draw-entities [canvas-width canvas-height entities ^Canvas canvas]
   (doto (.getGraphicsContext2D canvas)
@@ -65,11 +66,16 @@
 
 (defmulti event-handler :event/type)
 
+(def key->action
+  {"W" (fn [] (swap! *state update-in [:entities 0 :pos :y] dec))
+   "S" (fn [] (swap! *state update-in [:entities 0 :pos :y] inc))
+   "A" (fn [] (swap! *state update-in [:entities 0 :pos :x] dec))
+   "D" (fn [] (swap! *state update-in [:entities 0 :pos :x] inc))})
+
 (defmethod event-handler :event/scene-key-press [e]
-  (let [key-code (.getCode ^KeyEvent (:fx/event e))]
-    (condp = key-code
-      KeyCode/ENTER (swap! *state update-in [:entities 0 :y] - 50)
-      :empty)))
+  (let [key-code (str (.getCode ^KeyEvent (:fx/event e)))
+        action   (key->action key-code )]
+    (when action (action))))
 
 (def renderer
   (fx/create-renderer
