@@ -62,9 +62,9 @@
                                       :children [{:fx/type :label
                                                   :text    (str "You get past the " (obstacle :name) " with your " (solving-tool :name))}
                                                  {:fx/type   :button
-                                                  :text      (obstacle :name)
+                                                  :text      "Continue"
                                                   :on-action (fn [_]
-                                                               (swap! state assoc-in [:current-obstacle] nil))}]}
+                                                               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
                      :on-key-pressed {:event/type :event/scene-key-press}}})
         {:fx/type :stage
           :showing true
@@ -77,7 +77,7 @@
                                                 {:fx/type   :button
                                                  :text      (obstacle :name)
                                                  :on-action (fn [_]
-                                                              (swap! state assoc-in [:current-obstacle] nil))}]}
+                                                              (swap! *game-state assoc-in [:current-obstacle] nil))}]}
                     :on-key-pressed {:event/type :event/scene-key-press}}})))
 
 (defn draw-entity [^Canvas canvas {color       :color
