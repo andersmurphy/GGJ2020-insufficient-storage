@@ -46,14 +46,14 @@
   "Show the obstacle the player has collided with"
   []
   (println "ShowObstacle")
-  (println (obstacles (*state :current-obstacle)))
+  (println (obstacles (*game-state :current-obstacle)))
   {:fx/type :choice-dialog
    :showing true
    :on-close-request (fn [^DialogEvent e]
                        (when (nil? (.getResult ^Dialog (.getSource e)))
                          (.consume e)))
    :on-hidden (fn [_]
-                (swap! *state assoc-in [:current-obstacle] nil))
+                (swap! *game-state assoc-in [:current-obstacle] nil))
    :header-text "Please choose a memory to discard"
    :items [{:id :memory1}
            {:id :memory2}
@@ -100,8 +100,8 @@
    "S" (fn [_] (update-game-state! update-in [:player :pos :y] inc))
    "A" (fn [_] (update-game-state! update-in [:player :pos :x] dec))
    "D" (fn [_] (update-game-state! update-in [:player :pos :x] inc))
-   "X" (fn [_] (swap! *state assoc-in [:current-obstacle] :pit))
-   "Y" (fn [_] (swap! *state assoc-in [:current-obstacle] nil))})
+   "X" (fn [_] (swap! *game-state assoc-in [:current-obstacle] :pit))
+   "Y" (fn [_] (swap! *game-state assoc-in [:current-obstacle] nil))})
 
 (defmulti event-handler :event/type)
 (defmethod event-handler :event/scene-key-press [e]
