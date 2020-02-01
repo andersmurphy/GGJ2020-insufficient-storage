@@ -20,9 +20,18 @@
          {:color (if obstacle obstacle-color  entity-color)
           :pos   point}) points))
 
-(def obstacles {:pit {:name           "Deep Pit"
-                      :image          "DeepPitImage.png"
-                      :solved-by-tool :jumping-legs}})
+(def obstacles {:pit  {:name           "Deep Pit"
+                       :image          "DeepPitImage.png"
+                       :solved-by-tool :jumping-legs}
+                :trap {:name           "Deep Pit"
+                       :image          "DeepPitImage.png"
+                       :solved-by-tool :jumping-legs}
+                :gas  {:name           "Deep Pit"
+                       :image          "DeepPitImage.png"
+                       :solved-by-tool :jumping-legs}
+                :bomb {:name           "Deep Pit"
+                       :image          "DeepPitImage.png"
+                       :solved-by-tool :jumping-legs}})
 
 (def tools {:jumping-legs {:name  "Jumping Legs"
                            :image "JumpingLegs.png"}
@@ -52,10 +61,14 @@
          :maze-states-overtime (drop 1 maze-states-overtimes)
          :current-tools        #{}
          :current-memories     #{:summer-day}
+         :obstacles            (->> (filter :obstacle (last maze-states-overtimes))
+                                    (map (fn [obs-type-key obs]
+                                           (assoc obs :type obs-type-key))
+                                         (keys obstacles)))
          :current-obstacle     nil
          :memory-to-delete     nil}
          :validator #(and (not (collision? %))
-                         (not (run-out-of-maze-states? % )))))
+                          (not (run-out-of-maze-states? %)))))
 
 (defn pass-obstacle [obstacle]
   (let [solving-tool (tools (obstacle :solved-by-tool))]
@@ -175,7 +188,16 @@
   (try
     (apply swap! *game-state f args)
     (swap! *game-state update :maze-states-overtime (fn [x] (drop 1 x)))
+    (let [{{player-pos :pos} :player
+           obstacles         :obstacles} @*game-state]
+      (when-let [{obs-type :type} (first (filter (fn [obstacle]
+                                                   (= player-pos
+                                                      {:x (:x obstacle)
+                                                       :y (:y obstacle)}))
+                                                 obstacles))]
+        (swap! *game-state assoc :current-obstacle obs-type)))
     (catch Exception IllegalStateException)))
+
 
 (def key->action
   {"W" (fn [_] (update-game-state! update-in [:player :pos :y] dec))
