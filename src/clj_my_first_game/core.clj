@@ -2,7 +2,10 @@
   (:require [cljfx.api :as fx]
             [clojure.java.io :as io]
             [clj-my-first-game.maze-gen :as maze-gen])
-  (:import [javafx.scene.canvas Canvas]
+  (:import [javafx.scene Node]
+           [javafx.animation SequentialTransition FadeTransition ScaleTransition TranslateTransition Interpolator]
+           [javafx.util Duration]
+           [javafx.scene.canvas Canvas]
            [javafx.scene.input KeyCode KeyEvent]
            [javafx.scene.paint Color]
            [javafx.scene.control DialogEvent Dialog ButtonType ButtonBar$ButtonData]))
@@ -53,7 +56,8 @@
          :current-tools    #{}
          :current-memories #{:summer-day}
          :current-obstacle nil
-         :memory-to-delete nil}
+         :memory-to-delete nil
+         :memory-being-deleted nil}
         :validator no-collision?))
 
 (defn pass-obstacle [obstacle]
@@ -94,10 +98,53 @@
                                                 )}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
-(defn show-memory-to-delete [{state :state}]
+
+(defn- animate-delete-memory [^Node node]
+  (doto (ScaleTransition. (Duration/seconds 1) node)
+    (.setByX 3)
+    (.setByY 3)
+    (.setInterpolator Interpolator/EASE_BOTH)
+    (.play))
+  (doto (FadeTransition. (Duration/seconds 0.4) node)
+    (.setFromValue 1.0)
+    (.setToValue 0.4)
+    (.setAutoReverse true)
+    (.setCycleCount 12)
+    (.play))
+  )
+
+(defn show-memory-being-deleted [{state :state}]
   (println "Show")
-  (println (memories (state :memory-to-delete)))
-  (println (io/resource ((memories (state :memory-to-delete)) :image)))
+  (println (memories (state :memory-being-deleted)))
+  (println (io/resource ((memories (state :memory-being-deleted)) :image)))
+  (let [memory (memories (state :memory-being-deleted))]
+    {:fx/type :stage
+     :showing true
+     :scene   {:fx/type        :scene
+               :root           {:fx/type  :stack-pane
+                                :padding  20
+                                :children [{:fx/type  :v-box
+                                            :padding  20
+                                            :spacing  10
+                                            :children [{:fx/type  :h-box
+                                                        :padding  10
+                                                        :spacing  10
+                                                        :children [{:fx/type :image-view
+                                                                    :image {:url  (str (io/resource (memory :image)))
+                                                                            :requested-height 620
+                                                                            :preserve-ratio true
+                                                                            :background-loading true}}
+                                                                   {:fx/type :label
+                                                                    :wrap-text true
+                                                                    :text    (memory :description)}]}]}
+                                           {:fx/type fx/ext-on-instance-lifecycle
+                                            :on-created animate-delete-memory
+                                            :desc {:fx/type :label
+                                                   :text "DELETING!"
+                                                   :style {:-fx-font [:bold 20 :sans-serif] :-fx-text-fill "red"}}}]}
+               :on-key-pressed {:event/type :event/scene-key-press}}}))
+
+(defn show-memory-to-delete [{state :state}]
   (let [memory (memories (state :memory-to-delete))]
     {:fx/type :stage
      :showing true
@@ -122,7 +169,8 @@
                                             :children [{:fx/type   :button
                                                         :text      "Delete"
                                                         :on-action (fn [_]
-                                                                     (swap! *game-state assoc-in [:current-obstacle] nil))}
+                                                                     (swap! *game-state assoc-in [:memory-being-deleted] (state :memory-to-delete))
+                                                                     (swap! *game-state assoc-in [:memory-to-delete] nil))}
                                            {:fx/type   :button
                                             :text      "Cancel"
                                             :on-action (fn [_]
@@ -190,11 +238,14 @@
   (fx/create-renderer
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
-                                    :desc    (if (state :memory-to-delete)
-                                               [{:fx/type show-memory-to-delete :state state}]
-                                               (if (state :current-obstacle)
-                                               [{:fx/type choice-dialog :state state}]
-                                               [{:fx/type root-view :state state}]))}))
+                                    :desc    
+                                    (if (state :memory-being-deleted)
+                                      [{:fx/type show-memory-being-deleted :state state}]
+                                    (if (state :memory-to-delete)
+                                      [{:fx/type show-memory-to-delete :state state}]
+                                      (if (state :current-obstacle)
+                                        [{:fx/type choice-dialog :state state}]
+                                        [{:fx/type root-view :state state}])))}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (fx/mount-renderer *game-state renderer)
