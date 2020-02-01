@@ -17,10 +17,12 @@
 (def canvas-width  (* tile-size board-width))
 (def canvas-height (* tile-size board-height))
 (def entity-color (Color/web "#2E3440"))
+(def obstacle-color Color/GREEN)
 
 (defn points->entities [points]
-  (map (fn [point] {:color entity-color
-                    :pos   point}) points))
+  (map (fn [{:keys [obstacle] :as point}]
+         {:color (if obstacle obstacle-color  entity-color)
+          :pos   point}) points))
 
 (def obstacles {:pit {:name           "Deep Pit"
                       :image          "DeepPitImage.png"
@@ -31,35 +33,34 @@
             :long-arms    {:name  "Long Arms"
                            :image "LongArms.pns"}})
 
-(def memories {:summer-day {:name  "A summer day with Eric (129GB)"
-                            :image "images/summer-day.jpg"
+(def memories {:summer-day {:name        "A summer day with Eric (129GB)"
+                            :image       "images/summer-day.jpg"
                             :description "An old rope hangs from a tree branch overhanging the river. Eric grabs it and swings in a wild arc. He throws back his head and laughs. The branch creaks. “You try.” He throws you the rope. You examine it. Microorganisms thrive between the fibres. “Just do it,” Eric urges. You propel yourself out over the river. There is a curious moment at the apex of your swing where the world tilts and you gain new perspective. Then the branch snaps and you plunge into the murky water. Eric does not laugh as you climb from the water. “I thought you would spark or something. Like in the movies.”"}})
 
-(defn no-collision? [{:keys [player entities]}]
-  (not (->> (map :pos entities)
-            (some (partial = (:pos player))))))
+(defn collision? [{:keys [player maze-states-overtime]}]
+  (some (partial = (:pos player))
+        (first maze-states-overtime)))
 
-(defn boarder-points []
-  (concat (map (fn [x]{:x x :y 0}) (range board-width))
-          (map (fn [x]{:x x :y (dec board-height)}) (range board-width))
-          (map (fn [y]{:x 0 :y y}) (range board-height))
-          (map (fn [y]{:x (dec board-width) :y y}) (range board-height))))
+(defn run-out-of-maze-states? [{:keys [maze-states-overtime]}]
+  (empty? maze-states-overtime))
+
+(def maze-states-overtimes
+  (maze-gen/generate-maze-points-overtime
+   {:height    board-height
+    :width     board-width
+    :start-pos {:x 1 :y 1}}))
 
 (def *game-state
-  (atom {:player           {:color Color/RED
-                            :pos   {:x 1 :y 1}}
-         :entities         (-> (concat (boarder-points)
-                                       (vec (maze-gen/generate-maze-points
-                                             {:height    board-height
-                                              :width     board-width
-                                              :start-pos {:x 1 :y 1}})))
-                               points->entities)
-         :current-tools    #{}
-         :current-memories #{:summer-day}
-         :current-obstacle nil
-         :memory-to-delete nil
+  (atom {:player               {:color Color/RED
+                                :pos   {:x 1 :y 1}}
+         :maze-states-overtime (drop 1 maze-states-overtimes)
+         :current-tools        #{}
+         :current-memories     #{:summer-day}
+         :current-obstacle     nil
+         :memory-to-delete     nil
          :memory-being-deleted nil}
-        :validator no-collision?))
+         :validator #(and (not (collision? %))
+                         (not (run-out-of-maze-states? % )))))
 
 (defn pass-obstacle [obstacle]
   (let [solving-tool (tools (obstacle :solved-by-tool))]
@@ -87,15 +88,15 @@
                               :children (concat [{:fx/type :label
                                                   :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\nPlease choose a memory to discard")}]
                                                 (map (fn [memory] {
-                                                                   :fx/type   :button 
+                                                                   :fx/type   :button
                                                                    :text      ((memories memory) :name)
                                                                    :on-action (fn [_]
                                                                                 (swap! *game-state assoc-in [:memory-to-delete] memory))
                                                                    })(state :current-memories))
-                                                [{:fx/type :button
-                                                  :text "Cancel"
+                                                [{:fx/type   :button
+                                                  :text      "Cancel"
                                                   :on-action (fn [_]
-                                                         (swap! *game-state assoc-in [:current-obstacle] nil))}]
+                                                               (swap! *game-state assoc-in [:current-obstacle] nil))}]
                                                 )}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
@@ -163,13 +164,13 @@
                                             :padding  10
                                             :spacing  10
                                             :children [{:fx/type :image-view
-                                                        :image {:url  (str (io/resource (memory :image)))
-                                                                :requested-height 620
-                                                                :preserve-ratio true
-                                                                :background-loading true}}
-                                                       {:fx/type :label
+                                                        :image   {:url                (str (io/resource (memory :image)))
+                                                                  :requested-height   620
+                                                                  :preserve-ratio     true
+                                                                  :background-loading true}}
+                                                       {:fx/type   :label
                                                         :wrap-text true
-                                                        :text    (memory :description)}]}
+                                                        :text      (memory :description)}]}
                                            {:fx/type  :h-box
                                             :padding  10
                                             :spacing  10
@@ -207,7 +208,7 @@
     (.clearRect 0 0 canvas-width canvas-height))
   (run! (partial draw-entity canvas) entities))
 
-(defn root-view [{{:keys [entities player]} :state}]
+(defn root-view [{{:keys [maze-states-overtime player]} :state}]
   {:fx/type :stage
    :showing true
    :width   canvas-width
@@ -220,12 +221,16 @@
                                           :height  canvas-height
                                           :width   canvas-width
                                           :draw    (partial draw-entities
-                                                            (conj entities player))}]}
+                                                            (conj
+                                                             (points->entities
+                                                              (first maze-states-overtime))
+                                                             player))}]}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
 (defn update-game-state! [f & args]
   (try
     (apply swap! *game-state f args)
+    (swap! *game-state update :maze-states-overtime (fn [x] (drop 1 x)))
     (catch Exception IllegalStateException)))
 
 (def key->action
@@ -239,7 +244,7 @@
 (defmulti event-handler :event/type)
 (defmethod event-handler :event/scene-key-press [e]
   (let [key-code (str (.getCode ^KeyEvent (:fx/event e)))
-        action   (key->action key-code )]
+        action   (key->action key-code)]
     (when action (action e))))
 
 (def renderer

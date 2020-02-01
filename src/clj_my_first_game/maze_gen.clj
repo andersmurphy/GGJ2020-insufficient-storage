@@ -19,7 +19,7 @@
 (defn first-valid-neighbour [point walls board]
   (->> (neighbours-of point)
        (filter #(position-inside-grid? % board))
-       (filter #(walls %))
+       (filter #((set (remove :obstacle walls)) %))
        shuffle
        first))
 
@@ -27,23 +27,38 @@
   (disj walls  {:x (/ (+ x x2) 2)
                 :y (/ (+ y y2) 2)}))
 
-(defn evolve [walls start board]
-  (loop [walls      walls
-         point      start
-         backtracks []]
-    (let [walls     (disj walls point)
-          neighbour (first-valid-neighbour point walls board)]
-      (cond
-        neighbour          (recur (remove-midpoint walls point neighbour)
-                                  neighbour
-                                  (cons point backtracks))
-        (first backtracks) (recur walls
-                                  (first backtracks)
-                                  (rest backtracks))
-        :else              walls))))
+(defn evolve [walls point backtracks board walls-over-time]
+  (let [next-obstacle-fn (-> (filter :obstacle walls)
+                             count
+                             (drop [(fn [n] (> (int (* (:width board) (:height board) 0.95)) n))
+                                    (fn [n] (> (int (* (:width board) (:height board) 0.85)) n))
+                                    (fn [n] (> (int (* (:width board) (:height board) 0.75)) n))
+                                    (fn [n] (> (int (* (:width board) (:height board) 0.60)) n))])
+                             first)
+        walls            (-> (if (and next-obstacle-fn (next-obstacle-fn (count walls)))
+                               (conj walls (assoc point :obstacle true))
+                               walls)
+                             (disj point))
+        neighbour        (first-valid-neighbour point walls board)]
+    (cond
+      neighbour          (recur (remove-midpoint walls point neighbour)
+                                neighbour
+                                (cons point backtracks)
+                                board
+                                (conj walls-over-time walls))
+      (first backtracks) (recur walls
+                                (first backtracks)
+                                (rest backtracks)
+                                board
+                                walls-over-time)
+      :else              walls-over-time)))
 
-(defn generate-maze-points [{:keys [width height start-pos] :as board}]
+(defn generate-maze-points-overtime [{:keys [width height start-pos] :as board}]
   {:pre [(odd? width)
          (odd? height)]}
   (-> (create-walls board)
-      (evolve start-pos board)))
+      (evolve start-pos [] board [])))
+
+(comment (generate-maze-points-overtime {:height    21
+                                         :width     21
+                                         :start-pos {:x 1 :y 1}}))
