@@ -4,27 +4,29 @@
            [javafx.scene.input KeyCode KeyEvent]
            [javafx.scene.paint Color]))
 
+(def tile-size 50)
+
 (def *state
   (atom {:entities [{:color  Color/GREEN
                      :x      50
                      :y      50
-                     :height 50
-                     :width  50}
+                     :height tile-size
+                     :width  tile-size}
                     {:color  Color/GREEN
                      :x      100
                      :y      100
-                     :height 50
-                     :width  50}
+                     :height tile-size
+                     :width  tile-size}
                     {:color  Color/GREEN
                      :x      150
                      :y      150
-                     :height 50
-                     :width  50}]}))
+                     :height tile-size
+                     :width  tile-size}]}))
 
-(defn draw-entity [^Canvas canvas {:keys [color x y width height] :as m}]
+(defn draw-entity [^Canvas canvas {:keys [color x y]}]
   (doto (.getGraphicsContext2D canvas)
     (.setFill color)
-    (.fillRect x y width height)))
+    (.fillRect x y tile-size tile-size)))
 
 (defn draw-entities [canvas-width canvas-height entities ^Canvas canvas]
   (doto (.getGraphicsContext2D canvas)
@@ -53,11 +55,16 @@
 
 (defmulti event-handler :event/type)
 
+(def key->action
+  {"W" (fn [] (swap! *state update-in [:entities 0 :y] - tile-size))
+   "S" (fn [] (swap! *state update-in [:entities 0 :y] + tile-size))
+   "A" (fn [] (swap! *state update-in [:entities 0 :x] - tile-size))
+   "D" (fn [] (swap! *state update-in [:entities 0 :x] + tile-size))})
+
 (defmethod event-handler :event/scene-key-press [e]
-  (let [key-code (.getCode ^KeyEvent (:fx/event e))]
-    (condp = key-code
-      KeyCode/ENTER (swap! *state update-in [:entities 0 :y] - 50)
-      :empty)))
+  (let [key-code (str (.getCode ^KeyEvent (:fx/event e)))
+        action   (key->action key-code )]
+    (when action (action))))
 
 (def renderer
   (fx/create-renderer
