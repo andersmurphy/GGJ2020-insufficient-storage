@@ -46,33 +46,33 @@
          :current-obstacle nil}
         :validator no-collision?))
 
-(defn choice-dialog [state]
+(defn choice-dialog [{state :state}]
   (let [obstacle (if (state :current-obstacle)
                    (do
-                     (println obstacles) 
+                     (println obstacles)
                      (obstacles (state :current-obstacle)))
-                   (do 
+                   (do
                      (println state)
                      (println "NO")
                      (println (:current-obstacle state))
-                     {:name "Obstacle"
-                      :image ""
+                     {:name            "Obstacle"
+                      :image           ""
                       :solved-by-tools #{}}))]
     {:fx/type :stage
      :showing true
-     :scene {:fx/type :scene
-             :root {:fx/type :v-box
-                    :padding 20
-                    :spacing 10
-                    :children [{:fx/type :label
-                                :text "Please choose a memory to discard"}
-                               {:fx/type :button
-                                :text (obstacle :name)
-                                :on-action (fn [_]
-                                             (swap! state assoc-in [:current-obstacle] nil))}]}
-             :on-key-pressed {:event/type :event/scene-key-press}}}
+     :scene   {:fx/type        :scene
+               :root           {:fx/type  :v-box
+                                :padding  20
+                                :spacing  10
+                                :children [{:fx/type :label
+                                            :text    "Please choose a memory to discard"}
+                                           {:fx/type   :button
+                                            :text      (obstacle :name)
+                                            :on-action (fn [_]
+                                                         (swap! state assoc-in [:current-obstacle] nil))}]}
+               :on-key-pressed {:event/type :event/scene-key-press}}}
     )
-)
+  )
 
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
@@ -124,9 +124,9 @@
   (fx/create-renderer
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
-                                    :desc (if (state :current-obstacle)
-                                            [{:fx/type choice-dialog :state state}]
-                                            [{:fx/type root-view :state state}])}))
+                                    :desc    (if (state :current-obstacle)
+                                               [{:fx/type choice-dialog :state state}]
+                                               [{:fx/type root-view :state state}])}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (fx/mount-renderer *game-state renderer)
