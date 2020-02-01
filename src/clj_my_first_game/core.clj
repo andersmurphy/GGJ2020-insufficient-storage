@@ -42,12 +42,18 @@
          }
         :validator no-collision?))
 
-(defn choice-dialog [_]
-  ; (let [obstacle (if (@*game-state :current-obstacle)
-  ;       ((obstacles (@*game-state :current-obstacle) :name))
-  ;       {:name "Obstacle"
-  ;        :image ""
-  ;        :solved-by-tools #{}})]
+(defn choice-dialog [state]
+  (let [obstacle (if (state :current-obstacle)
+                   (do
+                     (println obstacles) 
+                     (obstacles (state :current-obstacle)))
+                   (do 
+                     (println state)
+                     (println "NO")
+                     (println (:current-obstacle state))
+                     {:name "Obstacle"
+                      :image ""
+                      :solved-by-tools #{}}))]
     {:fx/type :stage
      :showing true
      :scene {:fx/type :scene
@@ -57,11 +63,11 @@
                     :children [{:fx/type :label
                                 :text "Please choose a memory to discard"}
                                {:fx/type :button
-                                :text "(obstacle :name)"
+                                :text (obstacle :name)
                                 :on-action (fn [_]
                                              (swap! *game-state assoc-in [:current-obstacle] nil))}]}
-             ; :on-key-pressed {:event/type :event/scene-key-press}}
-     }}
+             :on-key-pressed {:event/type :event/scene-key-press}}}
+    )
 )
 
 (defn draw-entity [^Canvas canvas {color       :color
@@ -119,7 +125,7 @@
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
                                     :desc (if (state :current-obstacle)
-                                            [{:fx/type choice-dialog}]
+                                            [{:fx/type choice-dialog :state state}]
                                             [{:fx/type root-view :state state}])}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
