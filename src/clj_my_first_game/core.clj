@@ -5,7 +5,12 @@
            [javafx.scene.paint Color]
            [javafx.scene.control DialogEvent Dialog ButtonType ButtonBar$ButtonData]))
 
-(def tile-size 50)
+(def tile-size 20)
+(def board-width 20)
+(def board-height 20)
+(def canvas-width  (* tile-size board-width))
+(def canvas-height (* tile-size board-height))
+
 (def obstacles {:pit {:name            "Deep Pit"
                       :image           "DeepPitImage.png"
                       :solved-by-tools #{:jumping-legs}}})
@@ -19,47 +24,41 @@
   (not (->> (map :pos entities)
             (some (partial = (:pos player))))))
 
+(defn boarder-entites []
+  (->> (concat (map (fn [x][x 0]) (range board-width))
+               (map (fn [x][x (dec board-height )]) (range board-width))
+               (map (fn [y][0 y]) (range board-height))
+               (map (fn [y][(dec board-width) y]) (range board-height)))
+       (map (fn [[x y]] {:color Color/GREEN
+                         :pos   {:x x :y y}}))))
+
 (def *game-state
-  (atom {:player           {:color  Color/RED
-                            :pos    {:x 0 :y 0}
-                            :height tile-size
-                            :width  tile-size}
-         :entities         [{:color  Color/GREEN
-                             :pos    {:x 1 :y 1}
-                             :height tile-size
-                             :width  tile-size}
-                            {:color  Color/GREEN
-                             :pos    {:x 2 :y 2}
-                             :height tile-size
-                             :width  tile-size}
-                            {:color  Color/GREEN
-                             :pos    {:x 3 :y 3}
-                             :height tile-size
-                             :width  tile-size}]
+  (atom {:player           {:color Color/RED
+                            :pos   {:x 1 :y 1}}
+         :entities         (concat (boarder-entites))
          :current-tools    []
          :current-memories [:bicycle]
-         :current-obstacle nil
-         }
+         :current-obstacle nil}
         :validator no-collision?))
 
 (defn choice-dialog [_]
   (let [obstacle (if (@*game-state :current-obstacle)
-        ((obstacles (@*game-state :current-obstacle) :name))
-        {:name "Obstacle"
-         :image ""
-         :solved-by-tools #{}})]
+                   ((obstacles (@*game-state :current-obstacle) :name))
+                   {:name            "Obstacle"
+                    :image           ""
+                    :solved-by-tools #{}})]
     {:fx/type :stage
      :showing true
-     :scene {:fx/type :scene
-             :root {:fx/type :v-box
-                    :padding 20
-                    :spacing 10
-                    :children [{:fx/type :label
-                                :text "Please choose a memory to discard"}
-                               {:fx/type :button
-                                :text (obstacle :name)
-                                :on-action (fn [_]
-                                             (swap! *game-state assoc-in [:current-obstacle] nil))}]}}}))
+     :scene   {:fx/type :scene
+               :root    {:fx/type  :v-box
+                         :padding  20
+                         :spacing  10
+                         :children [{:fx/type :label
+                                     :text    "Please choose a memory to discard"}
+                                    {:fx/type   :button
+                                     :text      (obstacle :name)
+                                     :on-action (fn [_]
+                                                  (swap! *game-state assoc-in [:current-obstacle] nil))}]}}}))
 
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
@@ -67,30 +66,26 @@
     (.setFill color)
     (.fillRect (* tile-size x) (* tile-size y) tile-size tile-size)))
 
-(defn draw-entities [canvas-width canvas-height entities ^Canvas canvas]
+(defn draw-entities [entities ^Canvas canvas]
   (doto (.getGraphicsContext2D canvas)
     (.clearRect 0 0 canvas-width canvas-height))
   (run! (partial draw-entity canvas) entities))
 
 (defn root-view [{{:keys [entities player]} :state}]
-  (let [canvas-width  400
-        canvas-height 400]
-    {:fx/type :stage
-     :showing true
-     :width   canvas-width
-     :height  canvas-height
-     :x       200
-     :y       200
-     :scene   {:fx/type        :scene
-               :root           {:fx/type  :h-box
-                                :children [{:fx/type :canvas
-                                            :height  canvas-height
-                                            :width   canvas-width
-                                            :draw    (partial draw-entities
-                                                              canvas-width
-                                                              canvas-height
-                                                              (conj entities player))}]}
-               :on-key-pressed {:event/type :event/scene-key-press}}}))
+  {:fx/type :stage
+   :showing true
+   :width   canvas-width
+   :height  (+ canvas-height tile-size)
+   :x       200
+   :y       200
+   :scene   {:fx/type        :scene
+             :root           {:fx/type  :h-box
+                              :children [{:fx/type :canvas
+                                          :height  canvas-height
+                                          :width   canvas-width
+                                          :draw    (partial draw-entities
+                                                            (conj entities player))}]}
+             :on-key-pressed {:event/type :event/scene-key-press}}})
 
 (defn update-game-state! [f & args]
   (try
@@ -115,9 +110,9 @@
   (fx/create-renderer
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
-                                    :desc (if (state :current-obstacle)
-                                            [{:fx/type choice-dialog}]
-                                            [{:fx/type root-view :state state}])}))
+                                    :desc    (if (state :current-obstacle)
+                                               [{:fx/type choice-dialog}]
+                                               [{:fx/type root-view :state state}])}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (fx/mount-renderer *game-state renderer)
