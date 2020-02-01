@@ -42,22 +42,24 @@
          }
         :validator no-collision?))
 
-(defn choice-dialog
-  "Show the obstacle the player has collided with"
-  []
-  (println "ShowObstacle")
-  (println (obstacles (*game-state :current-obstacle)))
-  {:fx/type :choice-dialog
-   :showing true
-   :on-close-request (fn [^DialogEvent e]
-                       (when (nil? (.getResult ^Dialog (.getSource e)))
-                         (.consume e)))
-   :on-hidden (fn [_]
-                (swap! *game-state assoc-in [:current-obstacle] nil))
-   :header-text "Please choose a memory to discard"
-   :items [{:id :memory1}
-           {:id :memory2}
-           {:id :memory3}]})
+(defn choice-dialog [_]
+  (let [obstacle (if (@*game-state :current-obstacle)
+        ((obstacles (@*game-state :current-obstacle) :name))
+        {:name "Obstacle"
+         :image ""
+         :solved-by-tools #{}})]
+    {:fx/type :stage
+     :showing true
+     :scene {:fx/type :scene
+             :root {:fx/type :v-box
+                    :padding 20
+                    :spacing 10
+                    :children [{:fx/type :label
+                                :text "Please choose a memory to discard"}
+                               {:fx/type :button
+                                :text (obstacle :name)
+                                :on-action (fn [_]
+                                             (swap! *game-state assoc-in [:current-obstacle] nil))}]}}}))
 
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
@@ -114,7 +116,7 @@
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
                                     :desc (if (state :current-obstacle)
-                                            [{:fx/type root-view :state state}, {:fx/type choice-dialog}]
+                                            [{:fx/type choice-dialog}]
                                             [{:fx/type root-view :state state}])}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
