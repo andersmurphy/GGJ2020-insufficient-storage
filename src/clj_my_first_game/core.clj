@@ -21,8 +21,7 @@
                       :image           "DeepPitImage.png"
                       :solved-by-tools #{:jumping-legs}}})
 (def tools {:jumping-legs {:name         "Jumping Legs"
-                           :image        "JumpingLegs.png"
-                           :loses-memory :bicycle}})
+                           :image        "JumpingLegs.png"}})
 (def memories {:bicycle {:name  "Bicycle"
                          :image "BicycleImage.png"}})
 
@@ -41,8 +40,8 @@
   (atom {:player           {:color Color/RED
                             :pos   {:x 1 :y 1}}
          :entities         (concat (boarder-entites))
-         :current-tools    []
-         :current-memories [:bicycle]
+         :current-tools    #{:jumping-legs}
+         :current-memories #{:bicycle}
          :current-obstacle nil}
         :validator no-collision?))
 
@@ -50,23 +49,36 @@
   (let [obstacle (if (state :current-obstacle)
                    (obstacles (state :current-obstacle))
                    {:name            "Obstacle"
-                     :image           ""
-                     :solved-by-tools #{}})]
-    {:fx/type :stage
-     :showing true
-     :scene   {:fx/type        :scene
-               :root           {:fx/type  :v-box
-                                :padding  20
-                                :spacing  10
-                                :children [{:fx/type :label
-                                            :text    "Please choose a memory to discard"}
-                                           {:fx/type   :button
-                                            :text      (obstacle :name)
-                                            :on-action (fn [_]
-                                                         (swap! state assoc-in [:current-obstacle] nil))}]}
-               :on-key-pressed {:event/type :event/scene-key-press}}}
-    )
-  )
+                    :image           ""
+                    :solved-by-tools #{}})]
+    (if (some (state :current-tools) (obstacle :solved-by-tools))
+        (let [solving-tool (tools (first (filter (fn [tool] ((state :current-tools) tool)) (obstacle :solved-by-tools))))]
+          {:fx/type :stage
+           :showing true
+           :scene   {:fx/type        :scene
+                     :root           {:fx/type  :v-box
+                                      :padding  20
+                                      :spacing  10
+                                      :children [{:fx/type :label
+                                                  :text    (str "You get past the " (obstacle :name) " with your " (solving-tool :name))}
+                                                 {:fx/type   :button
+                                                  :text      (obstacle :name)
+                                                  :on-action (fn [_]
+                                                               (swap! state assoc-in [:current-obstacle] nil))}]}
+                     :on-key-pressed {:event/type :event/scene-key-press}}})
+        {:fx/type :stage
+          :showing true
+          :scene   {:fx/type        :scene
+                    :root           {:fx/type  :v-box
+                                     :padding  20
+                                     :spacing  10
+                                     :children [{:fx/type :label
+                                                 :text    "Please choose a memory to discard"}
+                                                {:fx/type   :button
+                                                 :text      (obstacle :name)
+                                                 :on-action (fn [_]
+                                                              (swap! state assoc-in [:current-obstacle] nil))}]}
+                    :on-key-pressed {:event/type :event/scene-key-press}}})))
 
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
