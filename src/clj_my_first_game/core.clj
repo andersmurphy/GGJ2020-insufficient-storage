@@ -114,8 +114,8 @@
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
                                     :desc (if (state :current-obstacle)
-                                            [{:fx/type root-view}, {:fx/type choice-dialog}]
-                                            [{:fx/type root-view}])}))
+                                            [{:fx/type root-view :state state}, {:fx/type choice-dialog}]
+                                            [{:fx/type root-view :state state}])}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (fx/mount-renderer *game-state renderer)
