@@ -19,9 +19,14 @@
 
 (def obstacles {:pit {:name            "Deep Pit"
                       :image           "DeepPitImage.png"
-                      :solved-by-tools #{:jumping-legs}}})
+                      :solved-by-tool  :jumping-legs}})
+
+
 (def tools {:jumping-legs {:name         "Jumping Legs"
-                           :image        "JumpingLegs.png"}})
+                           :image        "JumpingLegs.png"}
+  :long-arms {:name         "Long Arms"
+              :image        "LongArms.pns"}}
+  )
 (def memories {:bicycle {:name  "Bicycle"
                          :image "BicycleImage.png"}})
 
@@ -40,7 +45,7 @@
   (atom {:player           {:color Color/RED
                             :pos   {:x 1 :y 1}}
          :entities         (concat (boarder-entites))
-         :current-tools    #{:jumping-legs}
+         :current-tools    #{}
          :current-memories #{:bicycle}
          :current-obstacle nil}
         :validator no-collision?))
@@ -50,9 +55,9 @@
                    (obstacles (state :current-obstacle))
                    {:name            "Obstacle"
                     :image           ""
-                    :solved-by-tools #{}})]
-    (if (some (state :current-tools) (obstacle :solved-by-tools))
-        (let [solving-tool (tools (first (filter (fn [tool] ((state :current-tools) tool)) (obstacle :solved-by-tools))))]
+                    :solved-by-tool nil})]
+    (if (contains? (state :current-tools) (obstacle :solved-by-tool))
+        (let [solving-tool (tools (obstacle :solved-by-tool))]
           {:fx/type :stage
            :showing true
            :scene   {:fx/type        :scene
@@ -72,12 +77,12 @@
                     :root           {:fx/type  :v-box
                                      :padding  20
                                      :spacing  10
-                                     :children [{:fx/type :label
-                                                 :text    "Please choose a memory to discard"}
-                                                {:fx/type   :button
-                                                 :text      (obstacle :name)
-                                                 :on-action (fn [_]
-                                                              (swap! *game-state assoc-in [:current-obstacle] nil))}]}
+                                     :children (concat [{:fx/type :label
+                                                 :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\nPlease choose a memory to discard")}]
+                                                (map (fn [memory] {:fx/type   :button :text      ((memories memory) :name)}) (state :current-memories)))
+                                                }
+                                                ;  :on-action (fn [_]
+                                                ;               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
                     :on-key-pressed {:event/type :event/scene-key-press}}})))
 
 (defn draw-entity [^Canvas canvas {color       :color
