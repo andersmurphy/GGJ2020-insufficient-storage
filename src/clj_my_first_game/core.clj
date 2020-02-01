@@ -2,14 +2,8 @@
   (:require [cljfx.api :as fx])
   (:import [javafx.scene.canvas Canvas]
            [javafx.scene.input KeyCode KeyEvent]
-           [javafx.scene.paint Color]))
-
-(defn show-obstacle
-  "Show the obstacle the player has collided with"
-  [obstacle event]
-  (println "ShowObstacle")
-  (println obstacle)
-  (println event))
+           [javafx.scene.paint Color]
+           [javafx.scene.control DialogEvent Dialog ButtonType ButtonBar$ButtonData]))
 
 (def tile-size 50)
 (def obstacles {:pit {:name "Deep Pit"
@@ -36,9 +30,27 @@
                      :width  tile-size}]
          :current-tools []
          :current-memories [:bicycle]
+         :current-obstacle nil
          }
         )
   )
+
+(defn choice-dialog
+  "Show the obstacle the player has collided with"
+  []
+  (println "ShowObstacle")
+  (println (obstacles (*state :current-obstacle)))
+  {:fx/type :choice-dialog
+   :showing true
+   :on-close-request (fn [^DialogEvent e]
+                       (when (nil? (.getResult ^Dialog (.getSource e)))
+                         (.consume e)))
+   :on-hidden (fn [_]
+                (swap! *state assoc-in [:current-obstacle] nil))
+   :header-text "Please choose a memory to discard"
+   :items [{:id :memory1}
+           {:id :memory2}
+           {:id :memory3}]})
 
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
@@ -78,7 +90,8 @@
    "S" (fn [_] (swap! *state update-in [:entities 0 :pos :y] inc))
    "A" (fn [_] (swap! *state update-in [:entities 0 :pos :x] dec))
    "D" (fn [_] (swap! *state update-in [:entities 0 :pos :x] inc))
-   "X" (fn [e] (-> obstacles :pit (show-obstacle e)))
+   "X" (fn [_] (swap! *state update-in [:current-obstacle] :pit))
+   "Y" (fn [_] (swap! *state update-in [:current-obstacle] nil))
    })
 
 (defmethod event-handler :event/scene-key-press [e]
@@ -89,9 +102,10 @@
 (def renderer
   (fx/create-renderer
    :middleware (fx/wrap-map-desc (fn [state]
-                                   {:fx/type root-view
-                                    :state   state}))
+                                   {:fx/type fx/ext-many
+                                    :desc (if (state :current-obstacle)
+                                            [{:fx/type root-view}, {:fx/type choice-dialog}]
+                                            [{:fx/type root-view}])}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (comment (fx/mount-renderer *state renderer))
-         
