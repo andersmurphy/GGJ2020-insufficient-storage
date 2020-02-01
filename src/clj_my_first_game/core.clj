@@ -1,5 +1,6 @@
 (ns clj-my-first-game.core
-  (:require [cljfx.api :as fx])
+  (:require [cljfx.api :as fx]
+            [clj-my-first-game.maze-gen :as maze-gen])
   (:import [javafx.scene.canvas Canvas]
            [javafx.scene.input KeyCode KeyEvent]
            [javafx.scene.paint Color]
@@ -10,6 +11,11 @@
 (def board-height 20)
 (def canvas-width  (* tile-size board-width))
 (def canvas-height (* tile-size board-height))
+(def entity-color (Color/web "#2E3440"))
+
+(defn points->entities [points]
+  (map (fn [[x y]] {:color entity-color
+                    :pos   {:x x :y y}}) points))
 
 (def obstacles {:pit {:name            "Deep Pit"
                       :image           "DeepPitImage.png"
@@ -29,8 +35,7 @@
                (map (fn [x][x (dec board-height )]) (range board-width))
                (map (fn [y][0 y]) (range board-height))
                (map (fn [y][(dec board-width) y]) (range board-height)))
-       (map (fn [[x y]] {:color Color/GREEN
-                         :pos   {:x x :y y}}))))
+       points->entities))
 
 (def *game-state
   (atom {:player           {:color Color/RED
