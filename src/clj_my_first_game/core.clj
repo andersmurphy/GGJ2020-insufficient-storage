@@ -8,25 +8,23 @@
 
 (def *state
   (atom {:entities [{:color  Color/GREEN
-                     :x      50
-                     :y      50
+                     :pos    {:x 1 :y 1}
                      :height tile-size
                      :width  tile-size}
                     {:color  Color/GREEN
-                     :x      100
-                     :y      100
+                     :pos    {:x 2 :y 2}
                      :height tile-size
                      :width  tile-size}
                     {:color  Color/GREEN
-                     :x      150
-                     :y      150
+                     :pos    {:x 3 :y 3}
                      :height tile-size
                      :width  tile-size}]}))
 
-(defn draw-entity [^Canvas canvas {:keys [color x y]}]
+(defn draw-entity [^Canvas canvas {color       :color
+                                   {x :x y :y} :pos}]
   (doto (.getGraphicsContext2D canvas)
     (.setFill color)
-    (.fillRect x y tile-size tile-size)))
+    (.fillRect (* tile-size x) (* tile-size y) tile-size tile-size)))
 
 (defn draw-entities [canvas-width canvas-height entities ^Canvas canvas]
   (doto (.getGraphicsContext2D canvas)
@@ -56,10 +54,10 @@
 (defmulti event-handler :event/type)
 
 (def key->action
-  {"W" (fn [] (swap! *state update-in [:entities 0 :y] - tile-size))
-   "S" (fn [] (swap! *state update-in [:entities 0 :y] + tile-size))
-   "A" (fn [] (swap! *state update-in [:entities 0 :x] - tile-size))
-   "D" (fn [] (swap! *state update-in [:entities 0 :x] + tile-size))})
+  {"W" (fn [] (swap! *state update-in [:entities 0 :pos :y] dec))
+   "S" (fn [] (swap! *state update-in [:entities 0 :pos :y] inc))
+   "A" (fn [] (swap! *state update-in [:entities 0 :pos :x] dec))
+   "D" (fn [] (swap! *state update-in [:entities 0 :pos :x] inc))})
 
 (defmethod event-handler :event/scene-key-press [e]
   (let [key-code (str (.getCode ^KeyEvent (:fx/event e)))
