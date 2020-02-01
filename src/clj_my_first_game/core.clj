@@ -50,6 +50,36 @@
          :current-obstacle nil}
         :validator no-collision?))
 
+(defn pass-obstacle [obstacle]
+  (let [solving-tool (tools (obstacle :solved-by-tool))]
+    {:fx/type :stage
+     :showing true
+     :scene   {:fx/type        :scene
+               :root           {:fx/type  :v-box
+                                :padding  20
+                                :spacing  10
+                                :children [{:fx/type :label
+                                            :text    (str "You get past the " (obstacle :name) " with your " (solving-tool :name))}
+                                           {:fx/type   :button
+                                            :text      "Continue"
+                                            :on-action (fn [_]
+                                                         (swap! *game-state assoc-in [:current-obstacle] nil))}]}
+               :on-key-pressed {:event/type :event/scene-key-press}}}))
+
+(defn choose-memory-to-pass [obstacle state]
+  {:fx/type :stage
+   :showing true
+   :scene   {:fx/type        :scene
+             :root           {:fx/type  :v-box
+                              :padding  20
+                              :spacing  10
+                              :children (concat [{:fx/type :label
+                                                  :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\nPlease choose a memory to discard")}]
+                                                (map (fn [memory] {:fx/type   :button :text      ((memories memory) :name)}) (state :current-memories)))}
+                                                ;  :on-action (fn [_]
+                                                ;               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
+             :on-key-pressed {:event/type :event/scene-key-press}}})
+
 (defn choice-dialog [{state :state}]
   (let [obstacle (if (state :current-obstacle)
                    (obstacles (state :current-obstacle))
@@ -57,33 +87,9 @@
                     :image           ""
                     :solved-by-tool nil})]
     (if (contains? (state :current-tools) (obstacle :solved-by-tool))
-        (let [solving-tool (tools (obstacle :solved-by-tool))]
-          {:fx/type :stage
-           :showing true
-           :scene   {:fx/type        :scene
-                     :root           {:fx/type  :v-box
-                                      :padding  20
-                                      :spacing  10
-                                      :children [{:fx/type :label
-                                                  :text    (str "You get past the " (obstacle :name) " with your " (solving-tool :name))}
-                                                 {:fx/type   :button
-                                                  :text      "Continue"
-                                                  :on-action (fn [_]
-                                                               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
-                     :on-key-pressed {:event/type :event/scene-key-press}}})
-        {:fx/type :stage
-          :showing true
-          :scene   {:fx/type        :scene
-                    :root           {:fx/type  :v-box
-                                     :padding  20
-                                     :spacing  10
-                                     :children (concat [{:fx/type :label
-                                                 :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\nPlease choose a memory to discard")}]
-                                                (map (fn [memory] {:fx/type   :button :text      ((memories memory) :name)}) (state :current-memories)))
-                                                }
-                                                ;  :on-action (fn [_]
-                                                ;               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
-                    :on-key-pressed {:event/type :event/scene-key-press}}})))
+      (pass-obstacle obstacle)
+      (choose-memory-to-pass obstacle state)
+)))
 
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
