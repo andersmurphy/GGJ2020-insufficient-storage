@@ -4,6 +4,13 @@
            [javafx.scene.input KeyCode KeyEvent]
            [javafx.scene.paint Color]))
 
+(defn show-obstacle
+  "Show the obstacle the player has collided with"
+  [obstacle event]
+  (println "ShowObstacle")
+  (println obstacle)
+  (println event))
+
 (def tile-size 50)
 (def obstacles {:pit {:name "Deep Pit"
                       :image "DeepPitImage.png"
@@ -67,15 +74,17 @@
 (defmulti event-handler :event/type)
 
 (def key->action
-  {"W" (fn [] (swap! *state update-in [:entities 0 :pos :y] dec))
-   "S" (fn [] (swap! *state update-in [:entities 0 :pos :y] inc))
-   "A" (fn [] (swap! *state update-in [:entities 0 :pos :x] dec))
-   "D" (fn [] (swap! *state update-in [:entities 0 :pos :x] inc))})
+  {"W" (fn [_] (swap! *state update-in [:entities 0 :pos :y] dec))
+   "S" (fn [_] (swap! *state update-in [:entities 0 :pos :y] inc))
+   "A" (fn [_] (swap! *state update-in [:entities 0 :pos :x] dec))
+   "D" (fn [_] (swap! *state update-in [:entities 0 :pos :x] inc))
+   "X" (fn [e] (-> obstacles :pit (show-obstacle e)))
+   })
 
 (defmethod event-handler :event/scene-key-press [e]
   (let [key-code (str (.getCode ^KeyEvent (:fx/event e)))
         action   (key->action key-code )]
-    (when action (action))))
+    (when action (action e))))
 
 (def renderer
   (fx/create-renderer
