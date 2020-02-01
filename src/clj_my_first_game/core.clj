@@ -1,5 +1,6 @@
 (ns clj-my-first-game.core
   (:require [cljfx.api :as fx]
+            [clojure.java.io :as io]
             [clj-my-first-game.maze-gen :as maze-gen])
   (:import [javafx.scene.canvas Canvas]
            [javafx.scene.input KeyCode KeyEvent]
@@ -21,14 +22,14 @@
                       :image           "DeepPitImage.png"
                       :solved-by-tool  :jumping-legs}})
 
-
 (def tools {:jumping-legs {:name         "Jumping Legs"
                            :image        "JumpingLegs.png"}
   :long-arms {:name         "Long Arms"
               :image        "LongArms.pns"}}
   )
-(def memories {:bicycle {:name  "Bicycle"
-                         :image "BicycleImage.png"}})
+(def memories {:summer-day {:name  "A summer day with Eric (129GB)"
+                         :image "images/summer-day.jpg"
+                         :description "An old rope hangs from a tree branch overhanging the river. Eric grabs it and swings in a wild arc. He throws back his head and laughs. The branch creaks. “You try.” He throws you the rope. You examine it. Microorganisms thrive between the fibres. “Just do it,” Eric urges. You propel yourself out over the river. There is a curious moment at the apex of your swing where the world tilts and you gain new perspective. Then the branch snaps and you plunge into the murky water. Eric does not laugh as you climb from the water. “I thought you would spark or something. Like in the movies.”"}})
 
 (defn no-collision? [{:keys [player entities]}]
   (not (->> (map :pos entities)
@@ -46,8 +47,9 @@
                             :pos   {:x 1 :y 1}}
          :entities         (concat (boarder-entites))
          :current-tools    #{}
-         :current-memories #{:bicycle}
-         :current-obstacle nil}
+         :current-memories #{:summer-day}
+         :current-obstacle nil
+         :memory-to-delete nil}
         :validator no-collision?))
 
 (defn pass-obstacle [obstacle]
@@ -75,10 +77,48 @@
                               :spacing  10
                               :children (concat [{:fx/type :label
                                                   :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\nPlease choose a memory to discard")}]
-                                                (map (fn [memory] {:fx/type   :button :text      ((memories memory) :name)}) (state :current-memories)))}
-                                                ;  :on-action (fn [_]
-                                                ;               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
+                                                (map (fn [memory] {
+                                                                   :fx/type   :button 
+                                                                   :text      ((memories memory) :name)
+                                                                   :on-action (fn [_]
+                                                                                  (swap! *game-state assoc-in [:memory-to-delete] memory))
+                                                                   }) (state :current-memories)))}
              :on-key-pressed {:event/type :event/scene-key-press}}})
+
+(defn show-memory-to-delete [{state :state}]
+  (println "Show")
+  (println (memories (state :memory-to-delete)))
+  (println (io/resource ((memories (state :memory-to-delete)) :image)))
+  (let [memory (memories (state :memory-to-delete))]
+    {:fx/type :stage
+     :showing true
+     :scene   {:fx/type        :scene
+               :root           {:fx/type  :v-box
+                                :padding  20
+                                :spacing  10
+                                :children [{:fx/type  :h-box
+                                            :padding  10
+                                            :spacing  10
+                                            :children [{:fx/type :image-view
+                                                        :image {:url  (str (io/resource (memory :image)))
+                                                                :requested-height 620
+                                                                :preserve-ratio true
+                                                                :background-loading true}}
+                                                       {:fx/type :label
+                                                        :wrap-text true
+                                                        :text    (memory :description)}]}
+                                           {:fx/type  :h-box
+                                            :padding  10
+                                            :spacing  10
+                                            :children [{:fx/type   :button
+                                                        :text      "Delete"
+                                                        :on-action (fn [_]
+                                                                     (swap! *game-state assoc-in [:current-obstacle] nil))}
+                                           {:fx/type   :button
+                                            :text      "Cancel"
+                                            :on-action (fn [_]
+                                                         (swap! *game-state assoc-in [:memory-to-delete] nil))}]}]}
+               :on-key-pressed {:event/type :event/scene-key-press}}}))
 
 (defn choice-dialog [{state :state}]
   (let [obstacle (if (state :current-obstacle)
@@ -141,9 +181,11 @@
   (fx/create-renderer
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
-                                    :desc    (if (state :current-obstacle)
+                                    :desc    (if (state :memory-to-delete)
+                                               [{:fx/type show-memory-to-delete :state state}]
+                                               (if (state :current-obstacle)
                                                [{:fx/type choice-dialog :state state}]
-                                               [{:fx/type root-view :state state}])}))
+                                               [{:fx/type root-view :state state}]))}))
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (fx/mount-renderer *game-state renderer)
