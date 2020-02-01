@@ -1,0 +1,253 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using RogueSharp;
+using RogueSharp.Random;
+
+namespace GenTest.MapGenerators {
+    public class BSPMazeGen2020 : MapGenerator {
+        int width;
+        int height;
+
+        int minLevels;
+        int maxLevels;
+
+        float depthChance;
+
+        public BSPMazeGen2020(int w, int h, float d, int mnl, int mxl) {
+            width = w;
+            height = h;
+            depthChance = d;
+            minLevels = mnl;
+            maxLevels = mxl;
+        }
+
+        public override HouseFloor CreateMap(IRandom rng) {
+
+            HouseFloor map = new HouseFloor();
+            map.Initialize(width, height);
+            map.light = new int[width, height];
+            map.tiles = new TileTypes[width, height];
+
+
+            foreach (Cell cell in map.GetAllCells()) {
+                //make each cell a wall
+                map.SetCellProperties(cell.X, cell.Y, true, false);
+            }
+            Room baseRoom = new Room(0, 0, width, height);
+            //create room tree
+            baseRoom.GenerateLowerLevels(rng, depthChance, minLevels, maxLevels);
+
+
+            //set start and end nodes
+
+            //recurse down to a leaf node(maybe try to point them in directions to get as far away as possible? like always going leftin the tree for one, right for the other?
+            //mark one leaf as start, one as end 
+
+            Console.WriteLine("aaa");
+            //place barriers
+
+
+            //now, carve out the rooms
+            baseRoom.Carve(rng, map);
+
+            return map;
+
+
+        }
+
+        private class Room {
+            public List<Corridor> corridors;
+            public Room leftRoom;
+            public Room rightRoom;
+
+
+            private int top;
+            private int left;
+            private int right;
+            private int bottom;
+
+            public bool isStart;
+            public bool isEnd;
+
+            public Room(int x, int y, int r, int b) {
+                top = y;
+                left = x;
+                right = r;
+                bottom = b;
+                isStart = false;
+                isEnd = false;
+                corridors = new List<Corridor>();
+            }
+
+            public void GenerateLowerLevels(IRandom rng, float chance, int minLevels, int maxLevels) {
+                if (maxLevels <= 0) { return; }
+                if ((rng.Next(1, 1000000)) / 1000000f <= chance || minLevels > 0) {
+                    //split the room
+                    if (rng.Next(1, 2) == 1) {
+                        //split vertically
+                        int splitPoint = (left + right) / 2; //rng.Next(left + 1, left + width - 2);
+                        leftRoom = new Room(left, top, splitPoint - 1, bottom);
+                        rightRoom = new Room(splitPoint, top, right, bottom);
+                    } else {
+                        //split horizontally
+                        int splitPoint = (top + bottom) / 2;//rng.Next(top + 1, top + height - 2);
+                        leftRoom = new Room(left, top, right, splitPoint - 1);
+                        rightRoom = new Room(left, splitPoint, right, bottom);
+                    }
+                    //link up the rooms
+                    Corridor c = new Corridor();
+                    c.room1 = leftRoom;
+                    c.room2 = rightRoom;
+                    leftRoom.corridors.Add(c);
+                    rightRoom.corridors.Add(c);
+                    //recurse maybe
+                    leftRoom.GenerateLowerLevels(rng, chance, minLevels - 1, maxLevels - 1);
+                    rightRoom.GenerateLowerLevels(rng, chance, minLevels - 1, maxLevels - 1);
+                }
+            }
+
+
+            public void Carve(IRandom rng, HouseFloor map) {
+                if (leftRoom == null && rightRoom == null) {
+                    //TODO: technically, this can result in rooms bleeding into one another.
+                    //if we don't wan't this, place a load of adustements by 1 to move inner bounderies inwards
+
+                    //TODO: however we handle start/end rooms
+                    //int realTop = rng.Next(top, (top + bottom) / 2);
+                    //int realBottom = rng.Next((top + bottom) / 2 + 1, bottom-1);
+                    //int realLeft = rng.Next(left, (left + right) / 2);
+                    //int realRight = rng.Next((left + right) / 2 + 1, right-1);
+
+
+                    int realTop = top + 1;
+                    int realBottom = bottom - 1;
+                    int realLeft = left + 1;
+                    int realRight = right - 1;
+
+
+                    for (int x = realLeft; x <= realRight; x++) {
+                        for (int y = realTop; y <= realBottom; y++) {
+                            //carve out tile
+                            map.SetCellProperties(x, y, true, true);
+                        }
+                    }
+                } else {
+                    //this is not a leaf room, we only want to carve out the two rooms that exist within it
+                    leftRoom.Carve(rng, map);
+                    rightRoom.Carve(rng, map);
+
+                    //connect up the two rooms via their corridor
+
+
+                    //TODO:handle barrier status
+                    if (leftRoom.left == rightRoom.left) {
+                        //carve a vertical corridor
+                        bool foundX = false;
+                        int newX;
+                        //TODO:... this might hang if the dungeon rooms end up misaligned. I don't this this will happen if we almways make sure a central tile is always dug out (like I have in the digging code right now), but this might change...
+                        do {
+                            newX = rng.Next(leftRoom.left, leftRoom.right);
+                            //make sure there is a tile in leftRoom with this x;
+
+                            for (int y = leftRoom.top; y < leftRoom.bottom; y++) {
+                                if (map.GetCell(newX, y).IsWalkable) {
+                                    foundX = true;
+                                    break;
+                                }
+                            }
+
+                            if (foundX) {
+
+                                foundX = false;
+                                for (int y = rightRoom.top; y < rightRoom.bottom; y++) {
+                                    if (map.GetCell(newX, y).IsWalkable) {
+                                        foundX = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                        } while (!foundX);
+
+                        //we have a place to dig with
+                        //now start digging
+
+                        //leftRoom always has the smaller dimension, so we dig from it
+                        int curY = leftRoom.top;
+
+                        //get to the room
+                        while (!map.GetCell(newX, curY).IsWalkable) { curY++; }
+                        //move down to the bottom of the room
+                        while (map.GetCell(newX, curY).IsWalkable) { curY++; }
+                        //dig until we hit the other room
+                        while (!map.GetCell(newX, curY).IsWalkable) {
+                            map.SetCellProperties(newX, curY, true, true);
+                            curY++;
+                            if (!(curY < map.Height)) { break; }
+                        }
+
+                    } else {
+                        //carve a horizontal corridor
+                        bool foundY = false;
+                        int newY;
+
+                        do {
+                            newY = rng.Next(leftRoom.top, leftRoom.bottom - 1);
+                            //make sure there is a tile in leftRoom with this x;
+
+                            for (int x = leftRoom.left; x < leftRoom.right - 1; x++) {
+                                if (map.GetCell(x, newY).IsWalkable) {
+                                    foundY = true;
+                                    break;
+                                }
+                            }
+
+                            if (foundY) {
+
+                                foundY = false;
+                                for (int x = rightRoom.left; x < rightRoom.right - 1; x++) {
+                                    if (map.GetCell(x, newY).IsWalkable) {
+                                        foundY = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                        } while (!foundY);
+
+
+                        //leftRoom always has the smaller dimension, so we dig from it
+                        int curX = leftRoom.left;
+
+                        //get to the room
+                        while (!map.GetCell(curX, newY).IsWalkable) { curX++; }
+                        //move down to the bottom of the room
+                        while (map.GetCell(curX, newY).IsWalkable) { curX++; }
+                        //dig until we hit the other room
+                        while (!map.GetCell(curX, newY).IsWalkable) {
+                            map.SetCellProperties(curX, newY, true, true);
+                            curX++;
+                            if (!(curX < map.Width)) { break; }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private struct Corridor {
+            public Room room1;
+            public Room room2;
+            public bool obstacle;
+        }
+    }
+
+
+
+
+
+
+}
