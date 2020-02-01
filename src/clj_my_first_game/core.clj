@@ -48,16 +48,10 @@
 
 (defn choice-dialog [{state :state}]
   (let [obstacle (if (state :current-obstacle)
-                   (do
-                     (println obstacles)
-                     (obstacles (state :current-obstacle)))
-                   (do
-                     (println state)
-                     (println "NO")
-                     (println (:current-obstacle state))
-                     {:name            "Obstacle"
-                      :image           ""
-                      :solved-by-tools #{}}))]
+                   (obstacles (state :current-obstacle))
+                   {:name            "Obstacle"
+                     :image           ""
+                     :solved-by-tools #{}})]
     {:fx/type :stage
      :showing true
      :scene   {:fx/type        :scene
