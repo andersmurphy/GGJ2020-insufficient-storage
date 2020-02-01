@@ -7,26 +7,26 @@
            [javafx.scene.control DialogEvent Dialog ButtonType ButtonBar$ButtonData]))
 
 (def tile-size 20)
-(def board-width 20)
-(def board-height 20)
+(def board-width 35)
+(def board-height 35)
 (def canvas-width  (* tile-size board-width))
 (def canvas-height (* tile-size board-height))
 (def entity-color (Color/web "#2E3440"))
 
 (defn points->entities [points]
-  (map (fn [[x y]] {:color entity-color
-                    :pos   {:x x :y y}}) points))
+  (map (fn [point] {:color entity-color
+                    :pos   point}) points))
 
-(def obstacles {:pit {:name            "Deep Pit"
-                      :image           "DeepPitImage.png"
-                      :solved-by-tool  :jumping-legs}})
+(def obstacles {:pit {:name           "Deep Pit"
+                      :image          "DeepPitImage.png"
+                      :solved-by-tool :jumping-legs}})
 
 
-(def tools {:jumping-legs {:name         "Jumping Legs"
-                           :image        "JumpingLegs.png"}
-  :long-arms {:name         "Long Arms"
-              :image        "LongArms.pns"}}
-  )
+(def tools {:jumping-legs {:name  "Jumping Legs"
+                           :image "JumpingLegs.png"}
+            :long-arms    {:name  "Long Arms"
+                           :image "LongArms.pns"}})
+
 (def memories {:bicycle {:name  "Bicycle"
                          :image "BicycleImage.png"}})
 
@@ -34,19 +34,23 @@
   (not (->> (map :pos entities)
             (some (partial = (:pos player))))))
 
-(defn boarder-entites []
-  (->> (concat (map (fn [x][x 0]) (range board-width))
-               (map (fn [x][x (dec board-height )]) (range board-width))
-               (map (fn [y][0 y]) (range board-height))
-               (map (fn [y][(dec board-width) y]) (range board-height)))
-       points->entities))
+(defn boarder-points []
+  (concat (map (fn [x]{:x x :y 0}) (range board-width))
+          (map (fn [x]{:x x :y (dec board-height)}) (range board-width))
+          (map (fn [y]{:x 0 :y y}) (range board-height))
+          (map (fn [y]{:x (dec board-width) :y y}) (range board-height))))
 
 (def *game-state
   (atom {:player           {:color Color/RED
                             :pos   {:x 1 :y 1}}
-         :entities         (concat (boarder-entites))
-         :current-tools    #{}
-         :current-memories #{:bicycle}
+         :entities         (-> (concat (boarder-points)
+                                       (vec (maze-gen/generate-maze-points
+                                             {:height    board-height
+                                              :width     board-width
+                                              :start-pos {:x 1 :y 1}})))
+                               points->entities)
+         :current-tools    []
+         :current-memories [:bicycle]
          :current-obstacle nil}
         :validator no-collision?))
 
@@ -75,16 +79,16 @@
                               :spacing  10
                               :children (concat [{:fx/type :label
                                                   :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\nPlease choose a memory to discard")}]
-                                                (map (fn [memory] {:fx/type   :button :text      ((memories memory) :name)}) (state :current-memories)))}
-                                                ;  :on-action (fn [_]
-                                                ;               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
+                                                (map (fn [memory] {:fx/type :button :text ((memories memory) :name)}) (state :current-memories)))}
+                                        ;  :on-action (fn [_]
+                                        ;               (swap! *game-state assoc-in [:current-obstacle] nil))}]}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
 (defn choice-dialog [{state :state}]
   (let [obstacle (if (state :current-obstacle)
                    (obstacles (state :current-obstacle))
-                   {:name            "Obstacle"
-                    :image           ""
+                   {:name           "Obstacle"
+                    :image          ""
                     :solved-by-tool nil})]
     (if (contains? (state :current-tools) (obstacle :solved-by-tool))
       (pass-obstacle obstacle)
