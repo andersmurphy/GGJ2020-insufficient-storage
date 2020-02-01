@@ -5,6 +5,14 @@
            [javafx.scene.paint Color]))
 
 (def tile-size 50)
+(def obstacles {:pit {:name "Deep Pit"
+                      :image "DeepPitImage.png"
+                      :solved-by-tools #{:jumping-legs}}})
+(def tools {:jumping-legs {:name "Jumping Legs"
+                           :image "JumpingLegs.png"
+                           :loses-memory :bicycle}})
+(def memories {:bicycle {:name "Bicycle"
+                         :image "BicycleImage.png"}})
 
 (def *state
   (atom {:entities [{:color  Color/GREEN
@@ -19,16 +27,8 @@
                      :pos    {:x 3 :y 3}
                      :height tile-size
                      :width  tile-size}]
-         :current-memories ["Bicycle"]
          :current-tools []
-         :obstacles [{:name "Deep Pit"
-                      :image "DeepPitImage.png"
-                      :solved-by-tools ["Jumping Legs"]}]
-         :tools [{:name "Jumping Legs"
-                  :image "JumpingLegs.png"
-                  :loses-memory "Bicycle"}]
-         :memories [{:name "Bicycle"
-                     :image "BicycleImage.png"}]
+         :current-memories [:bicycle]
          }
         )
   )
