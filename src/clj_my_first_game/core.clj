@@ -1,6 +1,7 @@
 (ns clj-my-first-game.core
   (:require [cljfx.api :as fx]
             [clojure.java.io :as io]
+            [clojure.set :as s]
             [clj-my-first-game.maze-gen :as maze-gen])
   (:import [javafx.scene Node]
            [javafx.animation SequentialTransition FadeTransition ScaleTransition TranslateTransition Interpolator]
@@ -110,8 +111,7 @@
     (.setToValue 0.4)
     (.setAutoReverse true)
     (.setCycleCount 12)
-    (.play))
-  )
+    (.play)))
 
 (defn show-memory-being-deleted [{state :state}]
   (println "Show")
@@ -121,11 +121,11 @@
     {:fx/type :stage
      :showing true
      :scene   {:fx/type        :scene
-               :root           {:fx/type  :stack-pane
+               :root           {:fx/type  :v-box
                                 :padding  20
-                                :children [{:fx/type  :v-box
+                                :spacing  10
+                                :children [{:fx/type  :stack-pane
                                             :padding  20
-                                            :spacing  10
                                             :children [{:fx/type  :h-box
                                                         :padding  10
                                                         :spacing  10
@@ -136,13 +136,20 @@
                                                                             :background-loading true}}
                                                                    {:fx/type :label
                                                                     :wrap-text true
-                                                                    :text    (memory :description)}]}]}
-                                           {:fx/type fx/ext-on-instance-lifecycle
-                                            :on-created animate-delete-memory
-                                            :desc {:fx/type :label
-                                                   :text "DELETING!"
-                                                   :style {:-fx-font [:bold 20 :sans-serif] :-fx-text-fill "red"}}}]}
-               :on-key-pressed {:event/type :event/scene-key-press}}}))
+                                                                    :text    (memory :description)}]}
+                                                       {:fx/type fx/ext-on-instance-lifecycle
+                                                        :on-created animate-delete-memory
+                                                        :desc {:fx/type :label
+                                                               :text "DELETING!"
+                                                               :style {:-fx-font [:bold 20 :sans-serif] :-fx-text-fill "red"}}}]}
+                                           {:fx/type  :h-box
+                                            :padding  10
+                                            :spacing  10
+                                            :children [{:fx/type   :button
+                                                        :text      "Acknowledged"
+                                                        :on-action (fn [_]
+                                                                     (swap! *game-state assoc-in [:memory-being-deleted] nil))}]}]}
+                                :on-key-pressed {:event/type :event/scene-key-press}}}))
 
 (defn show-memory-to-delete [{state :state}]
   (let [memory (memories (state :memory-to-delete))]
@@ -169,6 +176,7 @@
                                             :children [{:fx/type   :button
                                                         :text      "Delete"
                                                         :on-action (fn [_]
+                                                                     (swap! *game-state update-in [:current-memories] (fn [old] (s/difference old #{(state :memory-to-delete)})))
                                                                      (swap! *game-state assoc-in [:memory-being-deleted] (state :memory-to-delete))
                                                                      (swap! *game-state assoc-in [:memory-to-delete] nil))}
                                            {:fx/type   :button
