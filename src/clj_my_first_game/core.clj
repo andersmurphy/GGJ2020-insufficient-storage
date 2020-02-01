@@ -19,7 +19,19 @@
                      :x      150
                      :y      150
                      :height 50
-                     :width  50}]}))
+                     :width  50}]
+         :current-memories ["Bicycle"]
+         :current-tools []
+         :obstacles [{:name "Deep Pit"
+                      :image "DeepPitImage.png"
+                      :solved-by-tools ["Jumping Legs"]}]
+         :tools [{:name "Jumping Legs"
+                  :image "JumpingLegs.png"
+                  :loses-memory "Bicycle"}]
+         :memories [{:name "Bicycle"
+                     :image "BicycleImage.png"}]}))
+         
+  
 
 (defn draw-entity [^Canvas canvas {:keys [color x y width height] :as m}]
   (doto (.getGraphicsContext2D canvas)
@@ -67,3 +79,4 @@
    :opts {:fx.opt/map-event-handler event-handler}))
 
 (comment (fx/mount-renderer *state renderer))
+         
