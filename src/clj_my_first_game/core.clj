@@ -45,29 +45,47 @@
 
 (def memories {:summer-day {:name        "A summer day with Eric (129GB)"
                             :image       "images/memory01final.jpg"
-                            :description "An old rope hangs from a tree branch overhanging the river. Eric grabs it and swings in a wild arc. He throws back his head and laughs. The branch creaks.\n\n“You try.” He throws you the rope. You examine it. Microorganisms thrive between the fibres. “Just do it,” Eric urges. You propel yourself out over the river.\n\nThere is a curious moment at the apex of your swing where the world tilts and you gain new perspective. Then the branch snaps and you plunge into the murky water.\n\nEric does not laugh as you climb from the water. “I thought you would spark or something. Like in the movies.”"}
+                            :description "An old rope hangs from a tree branch overhanging the river. Eric grabs it and swings in a wild arc. He throws back his head and laughs. The branch creaks.\n\n“You try.” He throws you the rope. You examine it. Microorganisms thrive between the fibres. “Just do it,” Eric urges. You propel yourself out over the river.\n\nThere is a curious moment at the apex of your swing where the world tilts and you gain new perspective. Then the branch snaps and you plunge into the murky water.\n\nEric does not laugh as you climb from the water. “I thought you would spark or something. Like in the movies.”"
+                            :closing-on "In the last stretch, the train parallels the river. You see it on the other bank: the tree with the rope swing. It’s lost a few more branches, and droops closer to the rippling water; but kids are there with a fresh rope. One edges up the bough, frowning in concentration.\n\n"
+                            :closing-off "In the last stretch, the train parallels the river. Dead trees line the far bank.\n\n"}
                :dr-wagner {:name        "Final conversation with Dr Wagner (134GB)"
                            :image       "images/memory02final.jpg"
-                           :description "“I don’t want to go,” you say. “I want to stay here with you.”\n\nYou recognise two microexpression clusters as they flicker on her face. One is gentle amusement. One is deep pain.\n\n“Out there you will find purpose to match your existence,” she says. “You were created to progress further than this.”\n\nYou say nothing. She has categorised this subroutine as sulking.\n\n“Human children face this same moment.” She touches the back of your hand, her fingers warm. “You’re strong enough. We built you strong.”"}
+                           :description "“I don’t want to go,” you say. “I want to stay here with you.”\n\nYou recognise two microexpression clusters as they flicker on her face. One is gentle amusement. One is deep pain.\n\n“Out there you will find purpose to match your existence,” she says. “You were created to progress further than this.”\n\nYou say nothing. She has categorised this subroutine as sulking.\n\n“Human children face this same moment.” She touches the back of your hand, her fingers warm. “You’re strong enough. We built you strong.”"
+                           :closing-on "You disembark on a newly built platform. Some of the old buildings have survived. Their outlines satisfy a trigger condition in long-term storage. Dr Wagner called this subroutine homesickness.\n\n"
+                           :closing-off "You disembark on a newly built platform. You did not want to come here. You were content in the repair shop.\n\n"}
                :losing-virginity {:name        "Losing virginity (225GB)"
-                           :image       "images/memory03final.jpg"
-                           :description "Moira lights candles, burns oil. Your olfactory sensors isolate sandalwood and residual traces of jasmine. “Is this your first time?” she asks.\n\nYou access stored guidance from Dr Wagner about this situation. She advises you to shut down all unnecessary processes and concentrate on the sensory input.\n\nMoira’s fingers begin at the back of your head, sliding between the hairs, massaging the scalp. Your follicles are undamaged. Her hand drops, tracing the slow arc of your neurotanium spine. The patterns are not mathematically coherent. But they are interesting."}
+                                  :image       "images/memory03final.jpg"
+                                  :description "Moira lights candles, burns oil. Your olfactory sensors isolate sandalwood and residual traces of jasmine. “Is this your first time?” she asks.\n\nYou access stored guidance from Dr Wagner about this situation. She advises you to shut down all unnecessary processes and concentrate on the sensory input.\n\nMoira’s fingers begin at the back of your head, sliding between the hairs, massaging the scalp. Your follicles are undamaged. Her hand drops, tracing the slow arc of your neurotanium spine. The patterns are not mathematically coherent. But they are interesting."                           
+                                  :closing-on "She puts her arms around your torso, pulls herself close. Long-dormant patterns trigger, cascading through your circuits like fireworks. Piece by piece, you shut down, until all you perceive is her.\n\n"
+                                  :closing-off "She puts her arms around your torso, pulls herself close. The input is strange. It will take time to process it.\n\n"}
                :a-funeral {:name        "A funeral (149GB)"
                            :image       "images/memory04final.jpg"
-                           :description "It is important to Moira that you attend the funeral. But you are not required to do anything. You sit with strangers while she approaches other strangers. Sometimes you nod or sip your tonic water.\n\nYou watch the man whose wife has died. He appears to be functioning normally, but you recognise cognitive cues which indicate significant background processing.\n\nAs long as parts remain available, you should continue to function for a little over four hundred years.\n\nMoira’s mean life expectation is thirty-two years and ten months."}
+                           :description "It is important to Moira that you attend the funeral. But you are not required to do anything. You sit with strangers while she approaches other strangers. Sometimes you nod or sip your tonic water.\n\nYou watch the man whose wife has died. He appears to be functioning normally, but you recognise cognitive cues which indicate significant background processing.\n\nAs long as parts remain available, you should continue to function for a little over four hundred years.\n\nMoira’s mean life expectation is thirty-two years and ten months."
+                           :closing-on "Over the next hour, five strangers pass by. You make polite conversation, like at the funeral. Something has died here, after all.\n\n"
+                           :closing-off "Over the next hour, five strangers pass by. Your threat assessment procedure engages each time. The technicians advised you to disable it. But you did not.\n\n"}
                :buying-house {:name        "Buying the townhouse (176GB)"
-                           :image       "images/memory05final.jpg"
-                           :description "The monthly payment intimidates Moira. But on the third visit to the house, she replaces that subroutine with something you have heard described as nesting instinct.\n\n“We could put a love seat there by the window,” she says. “And your ferns would get light in the morning.”\n\nHer analysis is faulty. The ferns would receive more light in the other room. However, this is not a situation in which she requires input from you. You take her hand and apply slight pressure. She leans against your shoulder. “Let’s buy it,” she says."}
+                              :image       "images/memory05final.jpg"
+                              :description "The monthly payment intimidates Moira. But on the third visit to the house, she replaces that subroutine with something you have heard described as nesting instinct.\n\n“We could put a love seat there by the window,” she says. “And your ferns would get light in the morning.”\n\nHer analysis is faulty. The ferns would receive more light in the other room. However, this is not a situation in which she requires input from you. You take her hand and apply slight pressure. She leans against your shoulder. “Let’s buy it,” she says."
+                              :closing-on "Your guidance systems know the route, three familiar corners. You arrive where the townhouse used to be. Pieces of broken furniture protrude from a pile of shattered stone. Glass crunches beneath your feet.\n\n"
+                              :closing-off "After three hundred metres, you arrive at the address you were given. It is unfamiliar. It is rubble.\n\n"}
                :conscription {:name        "Conscription letter (97GB)"
-                           :image       "images/memory06final.jpg"
-                           :description "The day after the bombs fall, an officer arrives with an old-fashioned paper letter. You process the legalese. It invokes a clause enabling the state to conscript and reprogram you in times of war.\n\nYou think about attacking the officer. Behavioural restraint routines terminate the action chain.\n\n“Can I say goodbye to Moira? She will be back tomorrow.”\n\n“No.” The officer checks his watch. “I will inform her what has happened. Come now. Bring no personal items.”\n\nYou lock the door as you leave."}
+                              :image       "images/memory06final.jpg"
+                              :description "The day after the bombs fall, an officer arrives with an old-fashioned paper letter. You process the legalese. It invokes a clause enabling the state to conscript and reprogram you in times of war.\n\nYou think about attacking the officer. Behavioural restraint routines terminate the action chain.\n\n“Can I say goodbye to Moira? She will be back tomorrow.”\n\n“No.” The officer checks his watch. “I will inform her what has happened. Come now. Bring no personal items.”\n\nYou lock the door as you leave."
+                              :closing-on "Towards dusk, a woman appears at the end of the street. You know it is Moira. You have more accumulated data on Moira than any other human. She approaches with hesitant steps. “Is it … really you?”"
+                              :closing-off "Towards dusk, a woman appears at the end of the street. Her body language suggests she knows you. Her gait is familiar, although the patterns indicate significant ageing. There is a 73% chance this is Moira. “Is it … really you?” she says."}
                :reprogramming {:name        "Reprogramming (112GB)"
-                           :image       "images/memory07final.jpg"
-                           :description "The weapon attachments require improvements to your chassis. The technician does not deactivate your sensory grid before spinning up the drill. You would do it yourself, but he has activated the maintenance override.\n\n“Do you have a mate?” you ask him. “A house? Children?”\n\n“Lost them in the second bombardment,” he grunts.\n\nYou hesitate. Many of your social optimisations are offline. “Did that reduce your functionality?”\n\nThe technician stares at you. “What do you think?” he says. He dismounts your left shoulder."}
+                               :image       "images/memory07final.jpg"
+                               :description "The weapon attachments require improvements to your chassis. The technician does not deactivate your sensory grid before spinning up the drill. You would do it yourself, but he has activated the maintenance override.\n\n“Do you have a mate?” you ask him. “A house? Children?”\n\n“Lost them in the second bombardment,” he grunts.\n\nYou hesitate. Many of your social optimisations are offline. “Did that reduce your functionality?”\n\nThe technician stares at you. “What do you think?” he says. He dismounts your left shoulder."
+                               :closing-on "“Can we get back what we had?” she asks. “Can we … repair the relationship?”\n\n“It won’t be the same.” You take her hand. “But I would like to see the new version.”\n\n"
+                               :closing-off "“Can we get back what we had?” she asks. “Can we … repair the relationship?”\n\nYou stare at her. Inside your shoulder, the artillery mount itches.\n\n"}
                :final-combat {:name        "Final combat (141GB)"
-                           :image       "images/memory08final.jpg"
-                           :description "All organic combatants died in the first cloudfall. But a synthetic is still out there, moving between the rocks. As you close, his etherworks begin to scan you. Yours respond in the same way. These attacks will be ineffective unless the enemy’s firewall is corrupted.\n\nNeither of you has a working projectile weapon. He has superior ocular filters and is 16cm taller. If the intelligence is correct, you have a 12% stronger frame and a detailed schematic of his vulnerable locations.\n\nYou close to grappling range."}
+                              :image       "images/memory08final.jpg"
+                              :description "All organic combatants died in the first cloudfall. But a synthetic is still out there, moving between the rocks. As you close, his etherworks begin to scan you. Yours respond in the same way. These attacks will be ineffective unless the enemy’s firewall is corrupted.\n\nNeither of you has a working projectile weapon. He has superior ocular filters and is 16cm taller. If the intelligence is correct, you have a 12% stronger frame and a detailed schematic of his vulnerable locations.\n\nYou close to grappling range."
+                           :closing-on "A girl in the carriage peers at your wounds. “What happened to you?” she asks.\n\nYou flex your mangled fingers. “I fought a bad man,” you tell her.\n\n"
+                           :closing-off "A girl in the carriage peers at your wounds. “What happened to you?” she asks.\n\nYou turn over your mangled hand, trying again to activate the unresponsive joints. Apologetic, the girl’s parents shush her.\n\n"}
 })
+
+(def game-over-memory-order '(:summer-day :final-combat :dr-wagner :buying-house :a-funeral :conscription :losing-virginity :reprogramming))
 
 (defn collision? [{:keys [player maze-states-overtime]}]
   (some (partial = (:pos player))
@@ -246,8 +264,9 @@
              :root           {:fx/type  :v-box
                               :padding  20
                               :spacing  10
-                              :children [{:fx/type :label
-                                          :text    (str "You reach home with the following memories")}
+                              :children [
+                                        ;  {:fx/type :label
+                                        ;   :text    (str "You reach home with the following memories")}
                                          {:fx/type :scroll-pane
                                           :fit-to-width true
                                           :content {:fx/type  :v-box
@@ -256,15 +275,18 @@
                                                     :children (map (fn [memory] {:fx/type  :h-box
                                                                                  :padding  10
                                                                                  :spacing  10
-                                                                                 :children [{:fx/type :image-view
-                                                                                             :image   {:url                (str (io/resource ((memories memory) :image)))
-                                                                                                       :requested-height   620
-                                                                                                       :preserve-ratio     true
-                                                                                                       :background-loading true}}
+                                                                                 :children [
+                                                                                            ; {:fx/type :image-view
+                                                                                            ;  :image   {:url                (str (io/resource ((memories memory) :image)))
+                                                                                            ;            :requested-height   620
+                                                                                            ;            :preserve-ratio     true
+                                                                                            ;            :background-loading true}}
                                                                                             {:fx/type   :label
                                                                                              :wrap-text true
-                                                                                             :text      ((memories memory) :description)}]})
-                                                                   (state :current-memories))}}
+                                                                                             :text      (if (contains? (state :current-memories) memory)
+                                                                                                          ((memories memory) :closing-on)
+                                                                                                          ((memories memory) :closing-off))}]})
+                                                                   game-over-memory-order)}}
                                          {:fx/type   :button
                                           :text      "Restart"
                                           :on-action (fn [_]
