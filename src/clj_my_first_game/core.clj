@@ -44,28 +44,28 @@
             :adamantium-exoskeleton    {:name  "Adamantium Exoskeleton"}})
 
 (def memories {:summer-day {:name        "A summer day with Eric (129GB)"
-                            :image       "images/summer-day.jpg"
+                            :image       "images/memory01final.jpg"
                             :description "An old rope hangs from a tree branch overhanging the river. Eric grabs it and swings in a wild arc. He throws back his head and laughs. The branch creaks.\n\n“You try.” He throws you the rope. You examine it. Microorganisms thrive between the fibres. “Just do it,” Eric urges. You propel yourself out over the river.\n\nThere is a curious moment at the apex of your swing where the world tilts and you gain new perspective. Then the branch snaps and you plunge into the murky water.\n\nEric does not laugh as you climb from the water. “I thought you would spark or something. Like in the movies.”"}
                :dr-wagner {:name        "Final conversation with Dr Wagner (134GB)"
-                           :image       "images/dr-wagner.jpg"
+                           :image       "images/memory02final.jpg"
                            :description "“I don’t want to go,” you say. “I want to stay here with you.”\n\nYou recognise two microexpression clusters as they flicker on her face. One is gentle amusement. One is deep pain.\n\n“Out there you will find purpose to match your existence,” she says. “You were created to progress further than this.”\n\nYou say nothing. She has categorised this subroutine as sulking.\n\n“Human children face this same moment.” She touches the back of your hand, her fingers warm. “You’re strong enough. We built you strong.”"}
                :losing-virginity {:name        "Losing virginity (225GB)"
-                           :image       "images/losing-virginity.jpg"
+                           :image       "images/memory03final.jpg"
                            :description "Moira lights candles, burns oil. Your olfactory sensors isolate sandalwood and residual traces of jasmine. “Is this your first time?” she asks.\n\nYou access stored guidance from Dr Wagner about this situation. She advises you to shut down all unnecessary processes and concentrate on the sensory input.\n\nMoira’s fingers begin at the back of your head, sliding between the hairs, massaging the scalp. Your follicles are undamaged. Her hand drops, tracing the slow arc of your neurotanium spine. The patterns are not mathematically coherent. But they are interesting."}
                :a-funeral {:name        "A funeral (149GB)"
-                           :image       "images/a-funeral.jpg"
+                           :image       "images/memory04final.jpg"
                            :description "It is important to Moira that you attend the funeral. But you are not required to do anything. You sit with strangers while she approaches other strangers. Sometimes you nod or sip your tonic water.\n\nYou watch the man whose wife has died. He appears to be functioning normally, but you recognise cognitive cues which indicate significant background processing.\n\nAs long as parts remain available, you should continue to function for a little over four hundred years.\n\nMoira’s mean life expectation is thirty-two years and ten months."}
                :buying-house {:name        "Buying the townhouse (176GB)"
-                           :image       "images/buying-house.jpg"
+                           :image       "images/memory05final.jpg"
                            :description "The monthly payment intimidates Moira. But on the third visit to the house, she replaces that subroutine with something you have heard described as nesting instinct.\n\n“We could put a love seat there by the window,” she says. “And your ferns would get light in the morning.”\n\nHer analysis is faulty. The ferns would receive more light in the other room. However, this is not a situation in which she requires input from you. You take her hand and apply slight pressure. She leans against your shoulder. “Let’s buy it,” she says."}
                :conscription {:name        "Conscription letter (97GB)"
-                           :image       "images/conscription.jpg"
+                           :image       "images/memory06final.jpg"
                            :description "The day after the bombs fall, an officer arrives with an old-fashioned paper letter. You process the legalese. It invokes a clause enabling the state to conscript and reprogram you in times of war.\n\nYou think about attacking the officer. Behavioural restraint routines terminate the action chain.\n\n“Can I say goodbye to Moira? She will be back tomorrow.”\n\n“No.” The officer checks his watch. “I will inform her what has happened. Come now. Bring no personal items.”\n\nYou lock the door as you leave."}
                :reprogramming {:name        "Reprogramming (112GB)"
-                           :image       "images/reprogramming.jpg"
+                           :image       "images/memory07final.jpg"
                            :description "The weapon attachments require improvements to your chassis. The technician does not deactivate your sensory grid before spinning up the drill. You would do it yourself, but he has activated the maintenance override.\n\n“Do you have a mate?” you ask him. “A house? Children?”\n\n“Lost them in the second bombardment,” he grunts.\n\nYou hesitate. Many of your social optimisations are offline. “Did that reduce your functionality?”\n\nThe technician stares at you. “What do you think?” he says. He dismounts your left shoulder."}
                :final-combat {:name        "Final combat (141GB)"
-                           :image       "images/final-combat.jpg"
+                           :image       "images/memory08final.jpg"
                            :description "All organic combatants died in the first cloudfall. But a synthetic is still out there, moving between the rocks. As you close, his etherworks begin to scan you. Yours respond in the same way. These attacks will be ineffective unless the enemy’s firewall is corrupted.\n\nNeither of you has a working projectile weapon. He has superior ocular filters and is 16cm taller. If the intelligence is correct, you have a 12% stronger frame and a detailed schematic of his vulnerable locations.\n\nYou close to grappling range."}
 })
 
