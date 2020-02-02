@@ -33,7 +33,7 @@
                              (drop [(fn [n] (> (int (* (:width board) (:height board) 0.95)) n))
                                     (fn [n] (> (int (* (:width board) (:height board) 0.85)) n))
                                     (fn [n] (> (int (* (:width board) (:height board) 0.75)) n))
-                                    (fn [n] (> (int (* (:width board) (:height board) 0.60)) n))])
+                                    (fn [n] (> (int (* (:width board) (:height board) 0.65)) n))])
                              first)
         walls            (-> (if (and next-obstacle-fn (next-obstacle-fn (count walls)))
                                (conj walls (assoc point :obstacle true))
