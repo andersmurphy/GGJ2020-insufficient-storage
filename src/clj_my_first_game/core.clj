@@ -7,6 +7,7 @@
   (:import [javafx.scene Node]
            [javafx.animation SequentialTransition FadeTransition ScaleTransition TranslateTransition Interpolator]
            [javafx.util Duration]
+           [javafx.scene.media MediaPlayer]
            [javafx.scene.canvas Canvas]
            [javafx.scene.input KeyCode KeyEvent]
            [javafx.scene.paint Color]
@@ -371,7 +372,7 @@
    :media-player {:fx/type :media-player
                   :state :playing
                   :volume 1
-                  :on-end-of-media {:event/type ::loop}
+                  :cycle-count MediaPlayer/INDEFINITE
                   :media {:fx/type :media
                           :source (str (io/resource (audio-for-memories (state :current-memories))))}}})
 
