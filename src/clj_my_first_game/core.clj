@@ -33,7 +33,7 @@
                        :solved-by-tool :jumping-legs}
                 :trap {:name           "Poison Trap"
                        :solved-by-tool :acid-blood}
-                :gas  {:name           "Poison Gas"
+                :gas  {:name           "Cloud of Poison Gas"
                        :solved-by-tool :iron-lungs}
                 :bomb {:name           "Bomb"
                        :solved-by-tool :adamantium-exoskeleton}})
