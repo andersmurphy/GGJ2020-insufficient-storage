@@ -30,22 +30,16 @@
           :pos   point}) points))
 
 (def obstacles {:pit  {:name           "Deep Pit"
-                       :image          "DeepPitImage.png"
                        :solved-by-tool :jumping-legs}
                 :trap {:name           "Poison Trap"
-                       :image          "DeepPitImage.png"
-                       :solved-by-tool :jumping-legs}
+                       :solved-by-tool :acid-blood}
                 :gas  {:name           "Deep Pit"
-                       :image          "DeepPitImage.png"
                        :solved-by-tool :jumping-legs}
                 :bomb {:name           "Deep Pit"
-                       :image          "DeepPitImage.png"
                        :solved-by-tool :jumping-legs}})
 
-(def tools {:jumping-legs {:name  "Jumping Legs"
-                           :image "JumpingLegs.png"}
-            :long-arms    {:name  "Long Arms"
-                           :image "LongArms.pns"}})
+(def tools {:jumping-legs {:name  "Jumping Legs"}
+            :long-arms    {:name  "Long Arms"}})
 
 (def memories {:summer-day {:name        "A summer day with Eric (129GB)"
                             :image       "images/summer-day.jpg"
