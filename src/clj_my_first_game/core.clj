@@ -177,7 +177,10 @@
                                             :children [{:fx/type   :button
                                                         :text      "Acknowledged"
                                                         :on-action (fn [_]
-                                                                     (swap! *game-state assoc-in [:memory-being-deleted] nil))}]}]}
+                                                                     (let [solved-obstacle (obstacles (@*game-state :current-obstacle))]
+                                                                       (swap! *game-state assoc-in [:memory-being-deleted] nil)
+                                                                       (swap! *game-state assoc-in [:current-tools] (s/union (@*game-state :current-tools) #{(solved-obstacle :solved-by-tool)})))
+                                                                     )}]}]}
                :on-key-pressed {:event/type :event/scene-key-press}}}))
 
 (defn show-memory-to-delete [{state :state}]
