@@ -335,6 +335,24 @@
         action   (key->action key-code)]
     (when action (action e))))
 
+(defn audio-for-memories [memories]
+  (let [track-num (- 8 (count memories))]
+    (println (str "audio/track" track-num ".wav"))
+    (str "audio/track" track-num ".wav")
+    )
+  )
+
+(defn media-view [{state :state}]
+  {:fx/type :media-view
+   :fit-width 640
+   :fit-height 480
+   :media-player {:fx/type :media-player
+                  :state :playing
+                  :volume 1
+                  :on-end-of-media {:event/type ::loop}
+                  :media {:fx/type :media
+                          :source (str (io/resource (audio-for-memories (state :current-memories))))}}})
+
 (defn -main []
   (fx/mount-renderer
    *game-state
@@ -343,13 +361,13 @@
                                     {:fx/type fx/ext-many
                                      :desc
                                      (if (state :at-end)
-                                       [{:fx/type show-game-over :state state}]
+                                       [{:fx/type show-game-over :state state}  {:fx/type media-view :state state}]
                                        (if (state :memory-being-deleted)
                                          [{:fx/type show-memory-being-deleted :state state}]
                                          (if (state :memory-to-delete)
                                            [{:fx/type show-memory-to-delete :state state}]
                                            (if (state :current-obstacle)
                                              [{:fx/type choice-dialog :state state}]
-                                             [{:fx/type root-view :state state}]))))}))
+                                             [{:fx/type root-view :state state} {:fx/type media-view :state state} ]))))}))
     :opts {:fx.opt/map-event-handler event-handler}))
   )
