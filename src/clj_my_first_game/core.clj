@@ -15,8 +15,8 @@
 
 (def tile-size 20)
 ;; board-width and height must be odd for maze gen to work
-(def board-width 15)
-(def board-height 15)
+(def board-width 45)
+(def board-height 23)
 (def canvas-width  (* tile-size board-width))
 (def canvas-height (* tile-size board-height))
 (def entity-color (Color/web "#2E3440"))
@@ -146,19 +146,18 @@
 (defn choose-memory-to-pass [obstacle state]
   {:fx/type :stage
    :showing true
+   :width   1280 ;canvas-width
+   :height  780 ;(+ canvas-height tile-size)
    :scene   {:fx/type        :scene
              :root           {:fx/type  :v-box
                               :padding  20
                               :spacing  10
                               :children (concat [{:fx/type :label
                                                   :text    (str "Before you is a " (obstacle :name) ". You can get past it with " ((tools (obstacle :solved-by-tool)) :name) "\n\nPlease choose a memory to discard")}]
-                                                (map (fn [memory] {
-                                                                   :fx/type   :button
+                                                (map (fn [memory] {:fx/type   :button
                                                                    :text      ((memories memory) :name)
                                                                    :on-action (fn [_]
-                                                                                (swap! *game-state assoc-in [:memory-to-delete] memory))
-                                                                   })(state :current-memories))
-                                                )}
+                                                                                (swap! *game-state assoc-in [:memory-to-delete] memory))}) (state :current-memories)))}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
 (defn- animate-delete-memory [^Node node]
@@ -178,6 +177,8 @@
   (let [memory (memories (state :memory-being-deleted))]
     {:fx/type :stage
      :showing true
+     :width   1280 ;canvas-width
+     :height  780 ;(+ canvas-height tile-size)
      :scene   {:fx/type        :scene
                :root           {:fx/type  :v-box
                                 :padding  20
@@ -208,14 +209,15 @@
                                                         :on-action (fn [_]
                                                                      (let [solved-obstacle (obstacles (@*game-state :current-obstacle))]
                                                                        (swap! *game-state assoc-in [:memory-being-deleted] nil)
-                                                                       (swap! *game-state assoc-in [:current-tools] (s/union (@*game-state :current-tools) #{(solved-obstacle :solved-by-tool)})))
-                                                                     )}]}]}
+                                                                       (swap! *game-state assoc-in [:current-tools] (s/union (@*game-state :current-tools) #{(solved-obstacle :solved-by-tool)}))))}]}]}
                :on-key-pressed {:event/type :event/scene-key-press}}}))
 
 (defn show-memory-to-delete [{state :state}]
   (let [memory (memories (state :memory-to-delete))]
     {:fx/type :stage
      :showing true
+     :width   1280 ;canvas-width
+     :height  780 ;(+ canvas-height tile-size)
      :scene   {:fx/type        :scene
                :root           {:fx/type  :v-box
                                 :padding  20
@@ -261,12 +263,13 @@
   (println "Game Over")
   {:fx/type :stage
    :showing true
+   :width   1280 ;canvas-width
+   :height  780 ;(+ canvas-height tile-size)
    :scene   {:fx/type        :scene
              :root           {:fx/type  :v-box
                               :padding  20
                               :spacing  10
-                              :children [
-                                        ;  {:fx/type :label
+                              :children [;  {:fx/type :label
                                         ;   :text    (str "You reach home with the following memories")}
                                          {:fx/type :scroll-pane
                                           :fit-to-width true
@@ -276,8 +279,7 @@
                                                     :children (map (fn [memory] {:fx/type  :h-box
                                                                                  :padding  10
                                                                                  :spacing  10
-                                                                                 :children [
-                                                                                            ; {:fx/type :image-view
+                                                                                 :children [; {:fx/type :image-view
                                                                                             ;  :image   {:url                (str (io/resource ((memories memory) :image)))
                                                                                             ;            :requested-height   620
                                                                                             ;            :preserve-ratio     true
@@ -291,8 +293,7 @@
                                          {:fx/type   :button
                                           :text      "Restart"
                                           :on-action (fn [_]
-                                                       (reset! *game-state (initial-game-state)))}
-                                         ]}
+                                                       (reset! *game-state (initial-game-state)))}]}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
 (defn draw-entity [^Canvas canvas {color       :color
@@ -309,10 +310,10 @@
 (defn root-view [{{:keys [maze-states-overtime player end]} :state}]
   {:fx/type :stage
    :showing true
-   :width   canvas-width
-   :height  (+ canvas-height tile-size)
-   :x       200
-   :y       200
+   :width   1280 ;canvas-width
+   :height  780 ;(+ canvas-height tile-size)
+   :x       0
+   :y       0
    :scene   {:fx/type        :scene
              :root           {:fx/type  :h-box
                               :children [{:fx/type :canvas
@@ -367,8 +368,6 @@
 
 (defn media-view [{state :state}]
   {:fx/type :media-view
-   :fit-width 640
-   :fit-height 480
    :media-player {:fx/type :media-player
                   :state :playing
                   :volume 1
