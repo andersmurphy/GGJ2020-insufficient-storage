@@ -384,7 +384,7 @@
                                     {:fx/type fx/ext-many
                                      :desc
                                      (if (state :at-end)
-                                       [{:fx/type show-game-over :state state}  {:fx/type media-view :state state}]
+                                       [{:fx/type show-game-over :state state}]
                                        (if (state :memory-being-deleted)
                                          [{:fx/type show-memory-being-deleted :state state}]
                                          (if (state :memory-to-delete)
