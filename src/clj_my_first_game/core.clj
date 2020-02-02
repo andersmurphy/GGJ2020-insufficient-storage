@@ -121,13 +121,8 @@
                                                                    :on-action (fn [_]
                                                                                 (swap! *game-state assoc-in [:memory-to-delete] memory))
                                                                    })(state :current-memories))
-                                                ; [{:fx/type   :button
-                                                ;   :text      "Cancel"
-                                                ;   :on-action (fn [_]
-                                                ;                (swap! *game-state assoc-in [:current-obstacle] nil))}]
                                                 )}
              :on-key-pressed {:event/type :event/scene-key-press}}})
-
 
 (defn- animate-delete-memory [^Node node]
   (doto (ScaleTransition. (Duration/seconds 1) node)
@@ -143,9 +138,6 @@
     (.play)))
 
 (defn show-memory-being-deleted [{state :state}]
-  (println "Show")
-  (println (memories (state :memory-being-deleted)))
-  (println (io/resource ((memories (state :memory-being-deleted)) :image)))
   (let [memory (memories (state :memory-being-deleted))]
     {:fx/type :stage
      :showing true
@@ -228,6 +220,39 @@
       (choose-memory-to-pass obstacle state)
 )))
 
+(defn show-game-over [{state :state}]
+  {:fx/type :stage
+   :showing true
+   :scene   {:fx/type        :scene
+             :root           {:fx/type  :v-box
+                              :padding  20
+                              :spacing  10
+                              :children [{:fx/type :label
+                                          :text    (str "You reach home with the following memories")}
+                                         {:fx/type :scroll-pane
+                                          :fit-to-width true
+                                          :content {:fx/type  :v-box
+                                                    :padding  20
+                                                    :spacing  10
+                                                    :children (map (fn [memory] {:fx/type  :h-box
+                                                                                 :padding  10
+                                                                                 :spacing  10
+                                                                                 :children [{:fx/type :image-view
+                                                                                             :image   {:url                (str (io/resource (memory :image)))
+                                                                                                       :requested-height   620
+                                                                                                       :preserve-ratio     true
+                                                                                                       :background-loading true}}
+                                                                                            {:fx/type   :label
+                                                                                             :wrap-text true
+                                                                                             :text      (memory :description)}]})
+                                                                   (state :current-memories))}}
+                                         {:fx/type   :button
+                                          :text      "Restart"
+                                          :on-action (fn [_]
+                                                       (reset! *game-state (initial-game-state)))}
+                                         ]}
+             :on-key-pressed {:event/type :event/scene-key-press}}})
+
 (defn draw-entity [^Canvas canvas {color       :color
                                    {x :x y :y} :pos}]
   (doto (.getGraphicsContext2D canvas)
@@ -272,11 +297,7 @@
                                                  obstacles))]
         (swap! *game-state assoc :current-obstacle obs-type))
       (when (= {:x (:x end) :y (:y end)} player-pos)
-        (swap! *game-state assoc :at-end true)
-
-        ;; Resets the game you probably want to call this in your final dialog
-        ;; I put it here as an example
-        (reset! *game-state (initial-game-state)))
+        (swap! *game-state assoc :at-end true))
       (swap! *game-state update :maze-states-overtime (fn [x] (drop 1 x))))
     (catch Exception IllegalStateException)))
 
@@ -299,14 +320,17 @@
   (fx/mount-renderer
    *game-state
    (fx/create-renderer
-   :middleware (fx/wrap-map-desc (fn [state]
-                                   {:fx/type fx/ext-many
-                                    :desc
-                                    (if (state :memory-being-deleted)
-                                      [{:fx/type show-memory-being-deleted :state state}]
-                                      (if (state :memory-to-delete)
-                                        [{:fx/type show-memory-to-delete :state state}]
-                                        (if (state :current-obstacle)
-                                          [{:fx/type choice-dialog :state state}]
-                                          [{:fx/type root-view :state state}])))}))
-   :opts {:fx.opt/map-event-handler event-handler})))
+    :middleware (fx/wrap-map-desc (fn [state]
+                                    {:fx/type fx/ext-many
+                                     :desc
+                                     (if (state :at-end)
+                                       [{:fx/type show-game-over :state state}]
+                                       (if (state :memory-being-deleted)
+                                         [{:fx/type show-memory-being-deleted :state state}]
+                                         (if (state :memory-to-delete)
+                                           [{:fx/type show-memory-to-delete :state state}]
+                                           (if (state :current-obstacle)
+                                             [{:fx/type choice-dialog :state state}]
+                                             [{:fx/type root-view :state state}]))))}))
+    :opts {:fx.opt/map-event-handler event-handler}))
+  )
