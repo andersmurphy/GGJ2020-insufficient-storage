@@ -121,10 +121,10 @@
                                                                    :on-action (fn [_]
                                                                                 (swap! *game-state assoc-in [:memory-to-delete] memory))
                                                                    })(state :current-memories))
-                                                [{:fx/type   :button
-                                                  :text      "Cancel"
-                                                  :on-action (fn [_]
-                                                               (swap! *game-state assoc-in [:current-obstacle] nil))}]
+                                                ; [{:fx/type   :button
+                                                ;   :text      "Cancel"
+                                                ;   :on-action (fn [_]
+                                                ;                (swap! *game-state assoc-in [:current-obstacle] nil))}]
                                                 )}
              :on-key-pressed {:event/type :event/scene-key-press}}})
 
