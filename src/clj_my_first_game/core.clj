@@ -1,4 +1,5 @@
 (ns clj-my-first-game.core
+  (:gen-class)
   (:require [cljfx.api :as fx]
             [clojure.java.io :as io]
             [clojure.set :as s]
@@ -291,8 +292,10 @@
         action   (key->action key-code)]
     (when action (action e))))
 
-(def renderer
-  (fx/create-renderer
+(defn -main []
+  (fx/mount-renderer
+   *game-state
+   (fx/create-renderer
    :middleware (fx/wrap-map-desc (fn [state]
                                    {:fx/type fx/ext-many
                                     :desc
@@ -303,6 +306,4 @@
                                         (if (state :current-obstacle)
                                           [{:fx/type choice-dialog :state state}]
                                           [{:fx/type root-view :state state}])))}))
-   :opts {:fx.opt/map-event-handler event-handler}))
-
-(fx/mount-renderer *game-state renderer)
+   :opts {:fx.opt/map-event-handler event-handler})))
