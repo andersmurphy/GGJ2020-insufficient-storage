@@ -359,8 +359,8 @@
 
 (defn audio-for-memories [memories]
   (let [track-num (- 8 (count memories))]
-    (println (str "audio/track" track-num ".wav"))
-    (str "audio/track" track-num ".wav")
+    (println (str "audio/" track-num ".wav"))
+    (str "audio/" track-num ".wav")
     )
   )
 
