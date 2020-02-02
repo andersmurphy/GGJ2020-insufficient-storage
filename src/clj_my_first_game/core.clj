@@ -33,13 +33,15 @@
                        :solved-by-tool :jumping-legs}
                 :trap {:name           "Poison Trap"
                        :solved-by-tool :acid-blood}
-                :gas  {:name           "Deep Pit"
-                       :solved-by-tool :jumping-legs}
-                :bomb {:name           "Deep Pit"
-                       :solved-by-tool :jumping-legs}})
+                :gas  {:name           "Poison Gas"
+                       :solved-by-tool :iron-lungs}
+                :bomb {:name           "Bomb"
+                       :solved-by-tool :adamantium-exoskeleton}})
 
-(def tools {:jumping-legs {:name  "Jumping Legs"}
-            :long-arms    {:name  "Long Arms"}})
+(def tools {:jumping-legs  {:name  "Jumping Legs"}
+            :acid-blood    {:name  "Acid Blood"}
+            :iron-lungs    {:name  "Iron Lungs"}
+            :adamantium-exoskeleton    {:name  "Adamantium Exoskeleton"}})
 
 (def memories {:summer-day {:name        "A summer day with Eric (129GB)"
                             :image       "images/summer-day.jpg"
